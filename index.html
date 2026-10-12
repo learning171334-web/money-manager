@@ -3,75 +3,196 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>My Money Manager</title>
 
 <style>
+* {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
+    background: #f4f5f7;
     margin: 0;
-    padding: 20px;
+    padding: 16px 10px;
+    display: flex;
+    justify-content: center;
 }
 
 .container {
-    max-width: 500px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
+    width: 100%;
+    max-width: 480px;
+    background: #ffffff;
+    padding: 22px 18px;
+    border-radius: 20px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
 }
 
 h1 {
     text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #111827;
 }
 
+/* Overview Summary Cards */
 .summary {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
+    gap: 10px;
+    margin-bottom: 22px;
 }
 
 .card {
-    background: #eeeeee;
-    padding: 12px;
-    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 12px 6px;
+    border-radius: 14px;
     text-align: center;
 }
 
-input,
-select,
-button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    box-sizing: border-box;
+.card b {
+    display: block;
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 4px;
 }
 
-button {
-    background: #222;
-    color: white;
+.card .amount {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+#income { color: #10b981; }
+#expense { color: #ef4444; }
+#balance { color: #1e293b; }
+
+/* Form Inputs */
+h3 {
+    font-size: 16px;
+    color: #1e293b;
+    margin-top: 18px;
+    margin-bottom: 10px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+input, select {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    background-color: #fff;
+}
+
+input:focus, select:focus {
+    border-color: #2563eb;
+}
+
+button.primary-btn {
+    width: 100%;
+    padding: 13px;
+    background: #0f172a;
+    color: #ffffff;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: opacity 0.2s;
+}
+
+button.primary-btn:active {
+    opacity: 0.8;
+}
+
+/* Sections */
+.section-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 16px;
+    margin-top: 20px;
+    border-radius: 14px;
+}
+
+/* Transaction List */
+.transaction {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    margin-top: 10px;
+    padding: 14px;
+    border-radius: 12px;
+}
+
+.tx-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.tx-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #1e293b;
+}
+
+.tx-badge {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.tx-badge.income { color: #10b981; }
+.tx-badge.expense { color: #ef4444; }
+
+.tx-sub {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.tx-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
 }
 
-.transaction {
-    background: #eeeeee;
-    margin-top: 10px;
-    padding: 12px;
-    border-radius: 10px;
-}
+.btn-edit { background: #e0f2fe; color: #0284c7; }
+.btn-delete { background: #fee2e2; color: #ef4444; }
 
-.monthly {
-    background: #f7f7f7;
-    padding: 15px;
+.backup-tools {
+    display: flex;
+    gap: 10px;
     margin-top: 15px;
-    border-radius: 10px;
 }
-
-.editing {
-    background: #fff3cd;
+.btn-backup {
+    flex: 1;
+    padding: 10px;
+    background: #e2e8f0;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: 600;
 }
 </style>
 </head>
@@ -82,514 +203,293 @@ button {
 
 <h1>💰 My Money Manager</h1>
 
+<!-- SUMMARY -->
 <div class="summary">
-
     <div class="card">
         <b>Income</b>
-        <div id="income">0 Ks</div>
+        <div class="amount" id="income">0 Ks</div>
     </div>
-
     <div class="card">
         <b>Expense</b>
-        <div id="expense">0 Ks</div>
+        <div class="amount" id="expense">0 Ks</div>
     </div>
-
     <div class="card">
         <b>Balance</b>
-        <div id="balance">0 Ks</div>
+        <div class="amount" id="balance">0 Ks</div>
     </div>
-
 </div>
 
-
+<!-- ADD TRANSACTION -->
 <h3>Add Transaction</h3>
 
 <label>Date</label>
 <input type="date" id="date">
 
 <label>Type</label>
-<select id="type">
-    <option value="income">Income</option>
-    <option value="expense">Expense</option>
+<select id="type" onchange="updateCategories()">
+    <option value="expense">Expense (အသုံးစရိတ်)</option>
+    <option value="income">Income (ဝင်ငွေ)</option>
 </select>
 
 <label>Category</label>
-<select id="category">
-    <option value="Salary">Salary</option>
-    <option value="Other">Other</option>
-    <option value="Food">Food</option>
-    <option value="Transport">Transport</option>
-    <option value="Shopping">Shopping</option>
-    <option value="Bills">Bills</option>
-</select>
+<select id="category"></select>
 
-<label>Amount</label>
-<input type="number" id="amount" placeholder="Enter amount">
+<label>Amount (Ks)</label>
+<input type="number" id="amount" placeholder="ငွေပမာဏ ရိုက်ထည့်ပါ">
 
 <label>Note</label>
-<input type="text" id="note" placeholder="Optional">
+<input type="text" id="note" placeholder="မှတ်ချက် (မဖြစ်မနေ မလိုပါ)">
 
-<button id="mainButton" onclick="addTransaction()">
+<button class="primary-btn" id="mainButton" onclick="addTransaction()">
     Add Transaction
 </button>
 
-
 <!-- MONTHLY SUMMARY -->
-
-<div class="monthly">
-
+<div class="section-box">
     <h3>📅 Monthly Summary</h3>
-
     <label>Select Month</label>
-
-    <input
-        type="month"
-        id="month"
-        onchange="monthlySummary()"
-    >
-
-    <div id="monthlyResult">
-        Select a month to see summary.
+    <input type="month" id="month" onchange="monthlySummary()">
+    <div id="monthlyResult" style="margin-top: 10px; font-size: 13px;">
+        လ ရွေးချယ်ပြီး အကျဉ်းချုပ်ကို ကြည့်ရှုပါ။
     </div>
-
 </div>
-
 
 <!-- EXPENSE CATEGORY SUMMARY -->
-
-<div class="monthly">
-
+<div class="section-box">
     <h3>📊 Expense by Category</h3>
-
-    <div id="categoryResult">
-        Select a month above.
+    <div id="categoryResult" style="font-size: 13px;">
+        အထက်တွင် လ ရွေးချယ်ပေးပါ။
     </div>
-
 </div>
 
-
 <!-- TRANSACTIONS -->
-
 <h3>Transactions</h3>
 
-<select id="filter" onchange="displayTransactions()">
-    <option value="all">All</option>
-    <option value="income">Income</option>
-    <option value="expense">Expense</option>
-</select>
+<div style="display: flex; gap: 8px; margin-top: 6px;">
+    <select id="filter" onchange="displayTransactions()" style="flex: 1;">
+        <option value="all">အားလုံး (All)</option>
+        <option value="income">Income သီးသန့်</option>
+        <option value="expense">Expense သီးသန့်</option>
+    </select>
+</div>
 
 <input
     type="text"
     id="search"
-    placeholder="🔎 Search transaction..."
+    placeholder="🔎 ရှာဖွေရန် (ရက်စွဲ၊ အမျိုးအစား၊ မှတ်ချက်)..."
     oninput="displayTransactions()"
+    style="margin-top: 8px;"
 >
 
 <div id="transactions"></div>
 
+<!-- DATA BACKUP -->
+<div class="backup-tools">
+    <button class="btn-backup" onclick="exportData()">📥 ဒေတာ Backup ဒေါင်းလုဒ်</button>
 </div>
 
+</div>
 
 <script>
+// Type အလိုက် Category စာရင်းများ
+const categoryMap = {
+    expense: ["Food & Drink", "Transport", "Shopping", "Bills", "Health", "Other"],
+    income: ["Salary", "Business", "Part-time", "Gift", "Other"]
+};
 
-let transactions =
-JSON.parse(
-    localStorage.getItem("moneyTransactions")
-) || [];
-
+let transactions = JSON.parse(localStorage.getItem("moneyTransactions")) || [];
 let editingIndex = -1;
 
+// Default Date ကို ဒီနေ့ရက်စွဲ ထည့်ပေးခြင်း
+document.getElementById("date").valueAsDate = new Date();
+
+// Type ပြောင်းရင် Category လိုက်ပြောင်းပေးခြင်း
+function updateCategories() {
+    const type = document.getElementById("type").value;
+    const catSelect = document.getElementById("category");
+    catSelect.innerHTML = "";
+    
+    categoryMap[type].forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        catSelect.appendChild(opt);
+    });
+}
+updateCategories();
 
 /* ADD / EDIT TRANSACTION */
-
 function addTransaction() {
-
-    const date =
-        document.getElementById("date").value;
-
-    const type =
-        document.getElementById("type").value;
-
-    const category =
-        document.getElementById("category").value;
-
-    const amount =
-        Number(
-            document.getElementById("amount").value
-        );
-
-    const note =
-        document.getElementById("note").value;
-
+    const date = document.getElementById("date").value;
+    const type = document.getElementById("type").value;
+    const category = document.getElementById("category").value;
+    const amount = Number(document.getElementById("amount").value);
+    const note = document.getElementById("note").value.trim();
 
     if (!date) {
-        alert("Please select a date.");
+        alert("ကျေးဇူးပြု၍ ရက်စွဲ ရွေးချယ်ပေးပါ။");
         return;
     }
-
-    if (amount <= 0) {
-        alert("Please enter a valid amount.");
+    if (amount <= 0 || isNaN(amount)) {
+        alert("ကျေးဇူးပြု၍ မှန်ကန်သော ငွေပမာဏ ရိုက်ထည့်ပါ။");
         return;
     }
-
 
     if (editingIndex === -1) {
-
-        transactions.push({
-            date,
-            type,
-            category,
-            amount,
-            note
-        });
-
+        transactions.push({ date, type, category, amount, note });
     } else {
-
-        transactions[editingIndex] = {
-            date,
-            type,
-            category,
-            amount,
-            note
-        };
-
+        transactions[editingIndex] = { date, type, category, amount, note };
         editingIndex = -1;
-
-        document.getElementById("mainButton").textContent =
-            "Add Transaction";
+        document.getElementById("mainButton").textContent = "Add Transaction";
     }
 
-
-    localStorage.setItem(
-        "moneyTransactions",
-        JSON.stringify(transactions)
-    );
-
-
+    localStorage.setItem("moneyTransactions", JSON.stringify(transactions));
     clearForm();
-
     displayTransactions();
     monthlySummary();
 }
 
-
 /* EDIT TRANSACTION */
-
 function editTransaction(index) {
-
     const t = transactions[index];
-
-    document.getElementById("date").value =
-        t.date;
-
-    document.getElementById("type").value =
-        t.type;
-
-    document.getElementById("category").value =
-        t.category;
-
-    document.getElementById("amount").value =
-        t.amount;
-
-    document.getElementById("note").value =
-        t.note;
-
+    document.getElementById("date").value = t.date;
+    document.getElementById("type").value = t.type;
+    updateCategories();
+    document.getElementById("category").value = t.category;
+    document.getElementById("amount").value = t.amount;
+    document.getElementById("note").value = t.note;
 
     editingIndex = index;
-
-
-    document.getElementById("mainButton").textContent =
-        "Save Changes";
-
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
+    document.getElementById("mainButton").textContent = "Save Changes";
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
-
 
 /* CLEAR FORM */
-
 function clearForm() {
-
     document.getElementById("amount").value = "";
-
     document.getElementById("note").value = "";
-
-    document.getElementById("date").value = "";
-
-    document.getElementById("type").value = "income";
-
-    document.getElementById("category").value = "Salary";
+    document.getElementById("date").valueAsDate = new Date();
+    document.getElementById("type").value = "expense";
+    updateCategories();
 }
-
 
 /* DISPLAY TRANSACTIONS */
-
 function displayTransactions() {
-
     let income = 0;
     let expense = 0;
-
-    const box =
-        document.getElementById("transactions");
-
+    const box = document.getElementById("transactions");
     box.innerHTML = "";
 
+    const filter = document.getElementById("filter").value;
+    const search = document.getElementById("search").value.toLowerCase().trim();
 
-    const filter =
-        document.getElementById("filter").value;
-
-    const search =
-        document.getElementById("search").value
-        .toLowerCase()
-        .trim();
-
-
+    // အသစ်ထည့်ထားတာ အပေါ်ဆုံးရောက်အောင် ပြောင်းပြန်စီစဉ်ခြင်း
     transactions.forEach(function(t, index) {
+        if (t.type === "income") income += t.amount;
+        if (t.type === "expense") expense += t.amount;
 
-        /* TOTAL SUMMARY */
+        if (filter !== "all" && t.type !== filter) return;
 
-        if (t.type === "income") {
-            income += t.amount;
-        }
+        const searchText = (t.date + " " + t.type + " " + t.category + " " + t.amount + " " + t.note).toLowerCase();
+        if (search !== "" && !searchText.includes(search)) return;
 
-        if (t.type === "expense") {
-            expense += t.amount;
-        }
+        const isIncome = t.type === "income";
+        const sign = isIncome ? "+" : "-";
 
-
-        /* FILTER */
-
-        if (
-            filter !== "all" &&
-            t.type !== filter
-        ) {
-            return;
-        }
-
-
-        /* SEARCH */
-
-        const searchText =
-            (
-                t.date + " " +
-                t.type + " " +
-                t.category + " " +
-                t.amount + " " +
-                t.note
-            ).toLowerCase();
-
-
-        if (
-            search !== "" &&
-            !searchText.includes(search)
-        ) {
-            return;
-        }
-
-
-        /* SHOW TRANSACTION */
-
-        box.innerHTML += `
-
+        box.innerHTML = `
         <div class="transaction">
-
-            <b>${t.date}</b><br>
-
-            ${t.type.toUpperCase()}
-            - ${t.category}<br>
-
-            ${t.amount.toLocaleString()} Ks<br>
-
-            ${t.note || ""}
-
-            <button onclick="editTransaction(${index})">
-                Edit
-            </button>
-
-            <button onclick="deleteTransaction(${index})">
-                Delete
-            </button>
-
+            <div class="tx-header">
+                <span class="tx-title">${t.category}</span>
+                <span class="tx-badge ${t.type}">${sign}${t.amount.toLocaleString()} Ks</span>
+            </div>
+            <div class="tx-sub">
+                📅 ${t.date} ${t.note ? `• <i>${t.note}</i>` : ""}
+            </div>
+            <div class="tx-actions">
+                <button class="btn-small btn-edit" onclick="editTransaction(${index})">Edit</button>
+                <button class="btn-small btn-delete" onclick="deleteTransaction(${index})">Delete</button>
+            </div>
         </div>
-
-        `;
-
+        ` + box.innerHTML;
     });
 
+    const balance = income - expense;
+    document.getElementById("income").textContent = income.toLocaleString() + " Ks";
+    document.getElementById("expense").textContent = expense.toLocaleString() + " Ks";
+    document.getElementById("balance").textContent = balance.toLocaleString() + " Ks";
 
-    /* BALANCE */
-
-    const balance =
-        income - expense;
-
-
-    document.getElementById("income").textContent =
-        income.toLocaleString() + " Ks";
-
-    document.getElementById("expense").textContent =
-        expense.toLocaleString() + " Ks";
-
-    document.getElementById("balance").textContent =
-        balance.toLocaleString() + " Ks";
+    if (transactions.length === 0) {
+        box.innerHTML = `<p style="text-align: center; color: #94a3b8; font-size: 13px; padding: 20px 0;">စာရင်းမှတ်တမ်း မရှိသေးပါ။</p>`;
+    }
 }
 
-
 /* MONTHLY SUMMARY */
-
 function monthlySummary() {
-
-    const selectedMonth =
-        document.getElementById("month").value;
-
+    const selectedMonth = document.getElementById("month").value;
 
     if (!selectedMonth) {
-
-        document.getElementById(
-            "monthlyResult"
-        ).innerHTML =
-            "Select a month to see summary.";
-
-        document.getElementById(
-            "categoryResult"
-        ).innerHTML =
-            "Select a month above.";
-
+        document.getElementById("monthlyResult").innerHTML = "လ ရွေးချယ်ပြီး အကျဉ်းချုပ်ကို ကြည့်ရှုပါ။";
+        document.getElementById("categoryResult").innerHTML = "အထက်တွင် လ ရွေးချယ်ပေးပါ။";
         return;
     }
 
-
     let income = 0;
     let expense = 0;
-
     let categories = {};
 
-
     transactions.forEach(function(t) {
-
-        if (
-            t.date.startsWith(selectedMonth)
-        ) {
-
-            if (t.type === "income") {
-                income += t.amount;
-            }
-
-
+        if (t.date.startsWith(selectedMonth)) {
+            if (t.type === "income") income += t.amount;
             if (t.type === "expense") {
-
                 expense += t.amount;
-
-
-                if (!categories[t.category]) {
-                    categories[t.category] = 0;
-                }
-
-
-                categories[t.category] +=
-                    t.amount;
+                categories[t.category] = (categories[t.category] || 0) + t.amount;
             }
-
         }
-
     });
 
-
-    const balance =
-        income - expense;
-
-
-    document.getElementById(
-        "monthlyResult"
-    ).innerHTML = `
-
-        <p>
-            <b>Month:</b>
-            ${selectedMonth}
-        </p>
-
-        <p>
-            💰 Income:
-            <b>${income.toLocaleString()} Ks</b>
-        </p>
-
-        <p>
-            💸 Expense:
-            <b>${expense.toLocaleString()} Ks</b>
-        </p>
-
-        <p>
-            📊 Balance:
-            <b>${balance.toLocaleString()} Ks</b>
-        </p>
-
+    const balance = income - expense;
+    document.getElementById("monthlyResult").innerHTML = `
+        <div style="line-height: 1.8;">
+            <div>💰 ဝင်ငွေ: <b style="color: #10b981;">+${income.toLocaleString()} Ks</b></div>
+            <div>💸 သုံးစွဲငွေ: <b style="color: #ef4444;">-${expense.toLocaleString()} Ks</b></div>
+            <div>📊 လက်ကျန်: <b>${balance.toLocaleString()} Ks</b></div>
+        </div>
     `;
 
-
-    let categoryHTML = "";
-
-
-    const categoryNames =
-        Object.keys(categories);
-
-
+    const categoryNames = Object.keys(categories);
     if (categoryNames.length === 0) {
-
-        categoryHTML =
-            "No expenses for this month.";
-
+        document.getElementById("categoryResult").innerHTML = "ဒီလအတွက် သုံးစွဲငွေစာရင်း မရှိပါ။";
     } else {
-
-        categoryNames.forEach(
-            function(category) {
-
-                categoryHTML += `
-
-                <p>
-                    <b>${category}</b>:
-                    ${categories[category]
-                        .toLocaleString()} Ks
-                </p>
-
-                `;
-
-            }
-        );
-
+        let categoryHTML = "<div style='line-height: 1.8;'>";
+        categoryNames.forEach(cat => {
+            categoryHTML += `<div>• <b>${cat}</b>: ${categories[cat].toLocaleString()} Ks</div>`;
+        });
+        categoryHTML += "</div>";
+        document.getElementById("categoryResult").innerHTML = categoryHTML;
     }
-
-
-    document.getElementById(
-        "categoryResult"
-    ).innerHTML =
-        categoryHTML;
 }
-
 
 /* DELETE TRANSACTION */
-
 function deleteTransaction(index) {
-
-    transactions.splice(index, 1);
-
-
-    localStorage.setItem(
-        "moneyTransactions",
-        JSON.stringify(transactions)
-    );
-
-
-    displayTransactions();
-    monthlySummary();
+    if (confirm("ဒီစာရင်းကို ဖျက်မှာ သေချာပါသလား?")) {
+        transactions.splice(index, 1);
+        localStorage.setItem("moneyTransactions", JSON.stringify(transactions));
+        displayTransactions();
+        monthlySummary();
+    }
 }
 
+/* EXPORT DATA */
+function exportData() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(transactions, null, 2));
+    const dlAnchor = document.createElement("a");
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", `money_backup_${new Date().toISOString().slice(0,10)}.json`);
+    dlAnchor.click();
+}
 
-/* START APP */
-
+// စတင် run ချိန်
 displayTransactions();
-
 </script>
 
 </body>
