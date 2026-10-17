@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>My Money Manager</title>
+  <title>Money Manager Pro</title>
   <style>
     :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(22, 30, 49, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
       --primary: #10b981;
-      --primary-dark: #059669;
-      --expense: #ef4444;
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --radius: 16px;
+      --primary-glow: rgba(16, 185, 129, 0.35);
+      --expense: #f43f5e;
+      --expense-glow: rgba(244, 63, 94, 0.35);
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+      --accent: #38bdf8;
     }
 
     * {
@@ -30,391 +31,464 @@
       color: var(--text);
       display: flex;
       justify-content: center;
-      padding-bottom: 80px;
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 480px;
       min-height: 100vh;
-      background: var(--surface);
-      position: relative;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      padding-bottom: 85px;
     }
 
-    /* Top App Bar */
-    .app-header {
-      padding: 20px 20px 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .app-wrapper {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      position: relative;
     }
-    .app-header h1 {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
+
+    /* Top Header */
+    .header {
+      padding: 22px 20px 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 {
+      font-size: 21px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    /* Wallet Card */
-    .wallet-card {
-      margin: 10px 20px 20px 20px;
-      padding: 22px;
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      border-radius: 20px;
-      color: #ffffff;
-      box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.3);
+    /* Main Balance Card */
+    .balance-card {
+      margin: 10px 18px 22px 18px;
+      padding: 24px;
+      border-radius: 24px;
+      background: radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.15) 0%, rgba(30, 41, 59, 0.7) 100%);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
     }
-    .wallet-card .label {
+    .balance-card::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 120px;
+      height: 120px;
+      background: var(--primary-glow);
+      filter: blur(50px);
+      border-radius: 50%;
+    }
+    .balance-title {
       font-size: 13px;
-      color: #94a3b8;
-      text-transform: uppercase;
+      color: var(--text-dim);
       letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
-    .wallet-card .balance {
-      font-size: 30px;
+    .balance-num {
+      font-size: 34px;
       font-weight: 800;
-      margin: 6px 0 18px 0;
+      margin: 8px 0 20px 0;
       letter-spacing: -0.5px;
     }
-    .wallet-stats {
+    .stats-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .stat-item {
+    .stat-pill {
       display: flex;
       align-items: center;
       gap: 10px;
     }
     .stat-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-weight: bold;
+      font-size: 15px;
     }
-    .stat-icon.inc { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-    .stat-icon.exp { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-    .stat-text .stat-val { font-size: 14px; font-weight: 700; }
-    .stat-text .stat-lbl { font-size: 11px; color: #94a3b8; }
+    .stat-icon.inc { background: rgba(16, 185, 129, 0.15); color: var(--primary); }
+    .stat-icon.exp { background: rgba(244, 63, 94, 0.15); color: var(--expense); }
+    .stat-label { font-size: 11px; color: var(--text-dim); }
+    .stat-val { font-size: 14px; font-weight: 700; margin-top: 2px; }
 
-    /* Tabs Content */
-    .tab-content {
-      display: none;
-      padding: 0 20px;
-    }
-    .tab-content.active {
-      display: block;
-    }
+    /* Containers */
+    .tab-content { display: none; padding: 0 18px; }
+    .tab-content.active { display: block; }
 
-    /* Form Card */
-    .card-box {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
+    .glass-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
       margin-bottom: 20px;
+      box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.4);
     }
-    .box-title {
+    .box-heading {
       font-size: 15px;
       font-weight: 700;
-      margin-bottom: 14px;
-      color: var(--text);
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .type-toggle {
+
+    /* Type Switcher */
+    .type-switcher {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 14px;
-      background: #e2e8f0;
+      background: rgba(11, 15, 25, 0.6);
       padding: 4px;
-      border-radius: 12px;
+      border-radius: 14px;
+      gap: 6px;
+      margin-bottom: 16px;
     }
-    .type-toggle button {
+    .type-btn {
+      padding: 11px;
       border: none;
-      padding: 10px;
       border-radius: 10px;
+      font-weight: 700;
       font-size: 13px;
-      font-weight: 600;
       cursor: pointer;
       background: transparent;
-      color: var(--text-muted);
-      transition: all 0.2s;
+      color: var(--text-dim);
+      transition: all 0.25s;
     }
-    .type-toggle button.active-exp {
-      background: var(--expense);
-      color: #ffffff;
-    }
-    .type-toggle button.active-inc {
-      background: var(--primary);
-      color: #ffffff;
-    }
+    .type-btn.active-exp { background: var(--expense); color: #fff; box-shadow: 0 4px 12px var(--expense-glow); }
+    .type-btn.active-inc { background: var(--primary); color: #fff; box-shadow: 0 4px 12px var(--primary-glow); }
 
-    .form-group {
-      margin-bottom: 12px;
-    }
-    .form-group label {
+    /* Inputs */
+    .input-group { margin-bottom: 14px; }
+    .input-group label {
       display: block;
       font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
+      color: var(--text-dim);
       margin-bottom: 6px;
+      font-weight: 600;
     }
-    .form-group input, .form-group select {
+    .input-field {
       width: 100%;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      background: #ffffff;
-      border-radius: 10px;
+      padding: 13px 15px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: rgba(11, 15, 25, 0.7);
+      color: #fff;
       font-size: 14px;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border 0.2s;
     }
-    .form-group input:focus, .form-group select:focus {
-      border-color: var(--primary);
+    .input-field:focus { border-color: var(--primary); }
+
+    /* Quick Amount Badges */
+    .quick-chips {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
     }
-    .btn-submit {
+    .chip {
+      padding: 6px 11px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+    }
+
+    .btn-action {
       width: 100%;
-      padding: 14px;
-      background: var(--primary);
-      color: #ffffff;
+      padding: 15px;
+      border-radius: 14px;
       border: none;
-      border-radius: 12px;
       font-size: 15px;
       font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), #059669);
       cursor: pointer;
+      box-shadow: 0 6px 20px var(--primary-glow);
       margin-top: 6px;
     }
 
-    /* Transaction List */
+    /* Transactions */
     .tx-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 14px;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      padding: 14px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
       margin-bottom: 10px;
     }
-    .tx-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .tx-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: #f1f5f9;
+    .tx-left { display: flex; align-items: center; gap: 12px; }
+    .tx-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 20px;
     }
-    .tx-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .tx-date {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-    .tx-right {
-      text-align: right;
-    }
-    .tx-amount {
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .tx-amount.exp { color: var(--expense); }
-    .tx-amount.inc { color: var(--primary); }
-    .btn-del {
-      border: none;
+    .tx-meta .title { font-size: 14px; font-weight: 700; }
+    .tx-meta .subtitle { font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+    .tx-right { text-align: right; display: flex; align-items: center; gap: 8px; }
+    .tx-amt { font-size: 14px; font-weight: 800; }
+    .tx-amt.inc { color: var(--primary); }
+    .tx-amt.exp { color: var(--expense); }
+    .btn-delete {
       background: transparent;
-      color: #cbd5e1;
-      font-size: 14px;
+      border: none;
+      color: #475569;
+      font-size: 15px;
       cursor: pointer;
-      margin-left: 8px;
+      padding: 4px;
     }
-    .btn-del:hover { color: var(--expense); }
+    .btn-delete:hover { color: var(--expense); }
 
-    /* Category Bar */
-    .cat-bar-item {
-      margin-bottom: 12px;
-    }
-    .cat-bar-header {
+    /* Canvas Chart */
+    .chart-container {
       display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      margin-bottom: 5px;
-      font-weight: 600;
-    }
-    .progress-track {
-      height: 8px;
-      background: #e2e8f0;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: var(--expense);
-      border-radius: 4px;
+      justify-content: center;
+      align-items: center;
+      margin: 15px 0;
+      position: relative;
     }
 
-    /* Bottom Nav Bar */
-    .bottom-nav {
+    /* Bottom Navigation */
+    .navbar {
       position: fixed;
       bottom: 0;
       width: 100%;
-      max-width: 480px;
-      height: 65px;
-      background: #ffffff;
-      border-top: 1px solid var(--border);
+      max-width: 440px;
+      height: 72px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--card-border);
       display: flex;
       justify-content: space-around;
       align-items: center;
       z-index: 50;
     }
-    .nav-btn {
-      border: none;
-      background: transparent;
+    .nav-item {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 4px;
-      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
-      width: 25%;
     }
-    .nav-btn .nav-icon {
-      font-size: 18px;
+    .nav-item .icon { font-size: 20px; }
+    .nav-item.active { color: var(--primary); }
+
+    /* PIN Lock Screen */
+    #lockScreen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
-    .nav-btn.active {
-      color: var(--primary);
+    .pin-dots {
+      display: flex;
+      gap: 14px;
+      margin: 24px 0 35px 0;
+    }
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--text-dim);
+    }
+    .dot.filled { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 75px);
+      gap: 16px;
+    }
+    .key-btn {
+      height: 75px;
+      border-radius: 50%;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: #fff;
+      font-size: 24px;
+      font-weight: 700;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <div class="app-container">
+  <!-- PIN Lock Screen -->
+  <div id="lockScreen">
+    <div style="font-size: 40px; margin-bottom: 10px;">🔒</div>
+    <h2 style="font-size: 18px;">လုံခြုံရေး PIN ကုတ် ရိုက်ထည့်ပါ</h2>
+    <div class="pin-dots">
+      <div class="dot" id="d1"></div>
+      <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
+      <div class="dot" id="d4"></div>
+    </div>
+    <div class="keypad">
+      <button class="key-btn" onclick="pressPin('1')">1</button>
+      <button class="key-btn" onclick="pressPin('2')">2</button>
+      <button class="key-btn" onclick="pressPin('3')">3</button>
+      <button class="key-btn" onclick="pressPin('4')">4</button>
+      <button class="key-btn" onclick="pressPin('5')">5</button>
+      <button class="key-btn" onclick="pressPin('6')">6</button>
+      <button class="key-btn" onclick="pressPin('7')">7</button>
+      <button class="key-btn" onclick="pressPin('8')">8</button>
+      <button class="key-btn" onclick="pressPin('9')">9</button>
+      <button class="key-btn" style="font-size: 14px;" onclick="clearPin()">ရှင်းမည်</button>
+      <button class="key-btn" onclick="pressPin('0')">0</button>
+      <button class="key-btn" onclick="pressPin('del')">⌫</button>
+    </div>
+  </div>
+
+  <div class="app-wrapper">
     <!-- Header -->
-    <div class="app-header">
-      <h1>💰 My Money Manager</h1>
+    <div class="header">
+      <h1>💎 Money Manager</h1>
+      <span id="activeMonthDisplay" style="font-size: 12px; color: var(--text-dim); background: rgba(255,255,255,0.06); padding: 5px 10px; border-radius: 20px;"></span>
     </div>
 
     <!-- Balance Card -->
-    <div class="wallet-card">
-      <div class="label">လက်ကျန်ငွေ (Balance)</div>
-      <div class="balance" id="totalBalance">0 Ks</div>
-      <div class="wallet-stats">
-        <div class="stat-item">
+    <div class="balance-card">
+      <div class="balance-title">လက်ကျန်ငွေပမာဏ (Net Balance)</div>
+      <div class="balance-num" id="totalBalance">0 Ks</div>
+      <div class="stats-row">
+        <div class="stat-pill">
           <div class="stat-icon inc">↓</div>
-          <div class="stat-text">
+          <div>
+            <div class="stat-label">စုစုပေါင်း ဝင်ငွေ</div>
             <div class="stat-val" id="totalIncome">0 Ks</div>
-            <div class="stat-lbl">ဝင်ငွေစုစုပေါင်း</div>
           </div>
         </div>
-        <div class="stat-item">
+        <div class="stat-pill">
           <div class="stat-icon exp">↑</div>
-          <div class="stat-text">
+          <div>
+            <div class="stat-label">စုစုပေါင်း သုံးငွေ</div>
             <div class="stat-val" id="totalExpense">0 Ks</div>
-            <div class="stat-lbl">သုံးငွေစုစုပေါင်း</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 1: HOME (Add Transaction & Recent) -->
+    <!-- TAB 1: HOME (Add Transaction) -->
     <div id="tabHome" class="tab-content active">
-      <div class="card-box">
-        <div class="box-title">➕ စာရင်းအသစ် ထည့်ရန်</div>
-        
-        <div class="type-toggle">
-          <button id="btnExp" class="active-exp" onclick="setType('Expense')">အသုံးစရိတ် (Expense)</button>
-          <button id="btnInc" onclick="setType('Income')">ဝင်ငွေ (Income)</button>
+      <div class="glass-box">
+        <div class="type-switcher">
+          <button id="btnExp" class="type-btn active-exp" onclick="setType('Expense')">အသုံးစရိတ်</button>
+          <button id="btnInc" class="type-btn" onclick="setType('Income')">ဝင်ငွေ</button>
         </div>
 
         <form id="txForm" onsubmit="addTransaction(event)">
-          <div class="form-group">
-            <label>ရက်စွဲ (Date)</label>
-            <input type="date" id="txDate" required>
+          <div class="input-group">
+            <label>ရက်စွဲ</label>
+            <input type="date" id="txDate" class="input-field" required>
           </div>
-          <div class="form-group">
-            <label>ကဏ္ဍ (Category)</label>
-            <select id="txCat" required></select>
+          <div class="input-group">
+            <label>ကဏ္ဍ</label>
+            <select id="txCat" class="input-field" required></select>
           </div>
-          <div class="form-group">
+          <div class="input-group">
             <label>ငွေပမာဏ (Ks)</label>
-            <input type="number" id="txAmount" placeholder="ဥပမာ - ၅၀၀၀" required min="1">
+            <input type="number" id="txAmount" class="input-field" placeholder="0" required min="1">
+            <div class="quick-chips">
+              <span class="chip" onclick="addAmount(1000)">+1,000</span>
+              <span class="chip" onclick="addAmount(5000)">+5,000</span>
+              <span class="chip" onclick="addAmount(10000)">+10,000</span>
+              <span class="chip" onclick="addAmount(50000)">+50,000</span>
+            </div>
           </div>
-          <div class="form-group">
-            <label>မှတ်ချက် (Note - မဖြစ်မနေ မလိုပါ)</label>
-            <input type="text" id="txNote" placeholder="မှတ်ချက်ရေးရန်">
+          <div class="input-group">
+            <label>မှတ်ချက် (Note)</label>
+            <input type="text" id="txNote" class="input-field" placeholder="ဥပမာ - နေ့လယ်စာစား">
           </div>
-          <button type="submit" class="btn-submit">စာရင်းသိမ်းမည်</button>
+          <button type="submit" class="btn-action">စာရင်းသွင်းမည် 💾</button>
         </form>
       </div>
 
-      <div class="box-title" style="margin: 10px 0 12px 4px;">နောက်ဆုံးမှတ်တမ်းများ</div>
+      <div class="box-heading" style="margin: 0 4px 12px 4px;">
+        <span>မကြာသေးမီ မှတ်တမ်းများ</span>
+      </div>
       <div id="recentList"></div>
     </div>
 
-    <!-- TAB 2: HISTORY (Full List with Search) -->
+    <!-- TAB 2: HISTORY (List + Filter) -->
     <div id="tabHistory" class="tab-content">
-      <div class="form-group">
-        <input type="text" id="searchBox" placeholder="🔍 စာရင်းမှတ်ချက် သို့မဟုတ် ကဏ္ဍ ရှာရန်..." oninput="renderHistory()">
+      <div class="glass-box" style="padding: 14px;">
+        <input type="text" id="searchBox" class="input-field" placeholder="🔍 စာရင်းမှတ်ချက် သို့မဟုတ် ကဏ္ဍ ရှာရန်..." oninput="renderHistory()">
       </div>
       <div id="fullHistoryList"></div>
     </div>
 
-    <!-- TAB 3: ANALYTICS -->
+    <!-- TAB 3: ANALYTICS (Donut Chart & Details) -->
     <div id="tabAnalytics" class="tab-content">
-      <div class="card-box">
-        <div class="box-title">📊 ကဏ္ဍအလိုက် အသုံးစရိတ် အချိုးအစား</div>
+      <div class="glass-box">
+        <div class="box-heading">
+          <span>📊 အသုံးစရိတ် စက်ဝိုင်းပုံဇယား</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="donutChart" width="220" height="220"></canvas>
+        </div>
         <div id="categoryBars"></div>
       </div>
     </div>
 
-    <!-- TAB 4: SETTINGS / BACKUP -->
+    <!-- TAB 4: SETTINGS & SECURITY -->
     <div id="tabSettings" class="tab-content">
-      <div class="card-box">
-        <div class="box-title">💾 ဒေတာသိမ်းဆည်းခြင်း (Data Backup)</div>
-        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
-          ဖုန်းပျောက်သွားလျှင် သို့မဟုတ် စက်ပြောင်းလျှင် စာရင်းများ မပျောက်သွားစေရန် Excel / CSV ဖိုင်အဖြစ် ဒေါင်းလုဒ်ရယူထားနိုင်ပါသည်။
-        </p>
-        <button class="btn-submit" onclick="exportToCSV()" style="background: #0284c7; margin-bottom: 10px;">📥 CSV (Excel) သို့ Export ထုတ်ယူမည်</button>
-        <button class="btn-submit" onclick="clearAllData()" style="background: #ef4444;">🗑️ စာရင်းအားလုံး ဖျက်မည် (Reset)</button>
+      <div class="glass-box">
+        <div class="box-heading">🔒 လုံခြုံရေး PIN ကုတ်</div>
+        <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 12px;">App ဖွင့်တိုင်း လျှို့ဝှက် PIN ကုတ် တောင်းဆိုစေရန် ဖွင့်ထားနိုင်ပါသည်။</p>
+        <button class="btn-action" onclick="configurePin()" style="background: #334155; margin-bottom: 10px;" id="pinStatusBtn">PIN ကုဒ် သတ်မှတ်မည်</button>
+      </div>
+
+      <div class="glass-box">
+        <div class="box-heading">💾 ဒေတာသိမ်းဆည်းမှု (Backup)</div>
+        <button class="btn-action" onclick="exportToCSV()" style="background: #0284c7; margin-bottom: 10px;">📥 Excel (CSV) သို့ ဒေါင်းလုဒ်ထုတ်မည်</button>
+        <button class="btn-action" onclick="clearAllData()" style="background: var(--expense);">🗑️ စာရင်းအားလုံး ဖျက်မည်</button>
       </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-      <button class="nav-btn active" onclick="switchTab('tabHome', this)">
-        <span class="nav-icon">🏠</span>
+    <!-- Bottom Nav -->
+    <div class="navbar">
+      <button class="nav-item active" onclick="switchTab('tabHome', this)">
+        <span class="icon">🏠</span>
         <span>ပင်မ</span>
       </button>
-      <button class="nav-btn" onclick="switchTab('tabHistory', this)">
-        <span class="nav-icon">📜</span>
+      <button class="nav-item" onclick="switchTab('tabHistory', this)">
+        <span class="icon">📜</span>
         <span>မှတ်တမ်း</span>
       </button>
-      <button class="nav-btn" onclick="switchTab('tabAnalytics', this)">
-        <span class="nav-icon">📊</span>
-        <span>သုံးသပ်ချက်</span>
+      <button class="nav-item" onclick="switchTab('tabAnalytics', this)">
+        <span class="icon">📊</span>
+        <span>ဇယား</span>
       </button>
-      <button class="nav-btn" onclick="switchTab('tabSettings', this)">
-        <span class="nav-icon">⚙️</span>
+      <button class="nav-item" onclick="switchTab('tabSettings', this)">
+        <span class="icon">⚙️</span>
         <span>ဆက်တင်</span>
       </button>
     </div>
@@ -423,30 +497,100 @@
   <script>
     const categories = {
       Expense: [
-        { name: "အစားအသောက်", icon: "🍔" },
-        { name: "သွားလာစရိတ်", icon: "🚗" },
-        { name: "ဈေးဝယ်စရိတ်", icon: "🛍️" },
-        { name: "မီး/ဖုန်းဘေလ်", icon: "💡" },
-        { name: "ကျန်းမာရေး", icon: "🏥" },
-        { name: "အထွေထွေသုံး", icon: "📦" }
+        { name: "အစားအသောက်", icon: "🍔", color: "#f43f5e" },
+        { name: "သွားလာစရိတ်", icon: "🚗", color: "#fb923c" },
+        { name: "ဈေးဝယ်ခြင်း", icon: "🛍️", color: "#a855f7" },
+        { name: "မီး/ဖုန်းဘေလ်", icon: "💡", color: "#eab308" },
+        { name: "ကျန်းမာရေး", icon: "🏥", color: "#06b6d4" },
+        { name: "အထွေထွေ", icon: "📦", color: "#64748b" }
       ],
       Income: [
-        { name: "လစာ", icon: "💼" },
-        { name: "အပိုဝင်ငွေ", icon: "💵" },
-        { name: "မုန့်ဖိုး/လက်ဆောင်", icon: "🎁" },
-        { name: "အရောင်းအဝယ်", icon: "🏪" }
+        { name: "လစာ", icon: "💼", color: "#10b981" },
+        { name: "အပိုဝင်ငွေ", icon: "💵", color: "#34d399" },
+        { name: "လက်ဆောင်/မုန့်ဖိုး", icon: "🎁", color: "#38bdf8" },
+        { name: "အရောင်းအဝယ်", icon: "🏪", color: "#818cf8" }
       ]
     };
 
     let currentType = 'Expense';
-    let transactions = JSON.parse(localStorage.getItem('money_records') || localStorage.getItem('transactions') || '[]');
+    let transactions = JSON.parse(localStorage.getItem('money_records') || '[]');
+    let userPin = localStorage.getItem('app_pin') || '';
+    let enteredPin = '';
 
     document.getElementById('txDate').valueAsDate = new Date();
+    document.getElementById('activeMonthDisplay').textContent = new Date().toLocaleString('en-US', { month: 'short', year: 'numeric' });
+
+    // Check PIN lock on open
+    if (userPin) {
+      document.getElementById('lockScreen').style.display = 'flex';
+    }
+
+    function pressPin(val) {
+      if (val === 'del') {
+        enteredPin = enteredPin.slice(0, -1);
+      } else if (enteredPin.length < 4) {
+        enteredPin += val;
+      }
+      updatePinDots();
+
+      if (enteredPin.length === 4) {
+        setTimeout(() => {
+          if (enteredPin === userPin) {
+            document.getElementById('lockScreen').style.display = 'none';
+            enteredPin = '';
+            updatePinDots();
+          } else {
+            alert('PIN ကုတ် မှားယွင်းနေပါသည်!');
+            enteredPin = '';
+            updatePinDots();
+          }
+        }, 100);
+      }
+    }
+
+    function clearPin() {
+      enteredPin = '';
+      updatePinDots();
+    }
+
+    function updatePinDots() {
+      for (let i = 1; i <= 4; i++) {
+        const dot = document.getElementById(`d${i}`);
+        if (i <= enteredPin.length) dot.classList.add('filled');
+        else dot.classList.remove('filled');
+      }
+    }
+
+    function configurePin() {
+      if (userPin) {
+        if (confirm('PIN Lock စနစ်ကို ပိတ်ရန် သေချာပါသလား?')) {
+          localStorage.removeItem('app_pin');
+          userPin = '';
+          alert('PIN Lock ပိတ်လိုက်ပါပြီ');
+          updatePinButton();
+        }
+      } else {
+        const p = prompt('ဂဏန်း ၄ လုံး PIN ကုတ် အသစ် ရိုက်ထည့်ပါ:');
+        if (p && p.length === 4 && !isNaN(p)) {
+          localStorage.setItem('app_pin', p);
+          userPin = p;
+          alert('PIN Lock အောင်မြင်စွာ သတ်မှတ်ပြီးပါပြီ');
+          updatePinButton();
+        } else {
+          alert('ဂဏန်း ၄ လုံး အတိအကျ ဖြစ်ရပါမည်');
+        }
+      }
+    }
+
+    function updatePinButton() {
+      const btn = document.getElementById('pinStatusBtn');
+      btn.textContent = userPin ? '🔓 PIN Lock ကို ပိတ်မည်' : '🔒 PIN ကုဒ် သတ်မှတ်မည်';
+    }
 
     function setType(type) {
       currentType = type;
-      document.getElementById('btnExp').className = type === 'Expense' ? 'active-exp' : '';
-      document.getElementById('btnInc').className = type === 'Income' ? 'active-inc' : '';
+      document.getElementById('btnExp').className = `type-btn ${type === 'Expense' ? 'active-exp' : ''}`;
+      document.getElementById('btnInc').className = `type-btn ${type === 'Income' ? 'active-inc' : ''}`;
       populateCategories();
     }
 
@@ -461,6 +605,11 @@
       });
     }
 
+    function addAmount(val) {
+      const input = document.getElementById('txAmount');
+      input.value = (parseFloat(input.value || 0) + val);
+    }
+
     function addTransaction(e) {
       e.preventDefault();
       const amount = parseFloat(document.getElementById('txAmount').value);
@@ -468,19 +617,13 @@
       const date = document.getElementById('txDate').value;
       const note = document.getElementById('txNote').value.trim();
 
-      const newTx = {
-        id: Date.now(),
-        type: currentType,
-        amount,
-        category,
-        date,
-        note
-      };
-
+      const newTx = { id: Date.now(), type: currentType, amount, category, date, note };
       transactions.unshift(newTx);
       saveData();
+
       document.getElementById('txAmount').value = '';
       document.getElementById('txNote').value = '';
+      if (navigator.vibrate) navigator.vibrate(40);
       renderAll();
     }
 
@@ -496,12 +639,12 @@
       localStorage.setItem('money_records', JSON.stringify(transactions));
     }
 
-    function getIcon(catName) {
+    function getCatMeta(catName) {
       for (const t of ['Expense', 'Income']) {
         const found = categories[t].find(c => c.name === catName);
-        if (found) return found.icon;
+        if (found) return found;
       }
-      return '💰';
+      return { icon: '💰', color: '#94a3b8' };
     }
 
     function renderAll() {
@@ -516,33 +659,32 @@
       document.getElementById('totalIncome').textContent = `${totalInc.toLocaleString()} Ks`;
       document.getElementById('totalExpense').textContent = `${totalExp.toLocaleString()} Ks`;
 
-      // Recent List (top 5)
       const recentList = document.getElementById('recentList');
       recentList.innerHTML = '';
-      transactions.slice(0, 5).forEach(t => {
-        recentList.appendChild(createTxElement(t));
-      });
+      transactions.slice(0, 5).forEach(t => recentList.appendChild(createTxElement(t)));
 
       renderHistory();
-      renderAnalytics(totalExp);
+      drawChart(totalExp);
+      updatePinButton();
     }
 
     function createTxElement(t) {
+      const meta = getCatMeta(t.category);
       const div = document.createElement('div');
       div.className = 'tx-item';
       div.innerHTML = `
         <div class="tx-left">
-          <div class="tx-icon">${getIcon(t.category)}</div>
-          <div>
-            <div class="tx-name">${t.category} ${t.note ? `<span style="font-weight:normal;color:#64748b;">(${t.note})</span>` : ''}</div>
-            <div class="tx-date">${t.date}</div>
+          <div class="tx-avatar">${meta.icon}</div>
+          <div class="tx-meta">
+            <div class="title">${t.category} ${t.note ? `<span style="font-weight:normal;color:#94a3b8;">(${t.note})</span>` : ''}</div>
+            <div class="subtitle">${t.date}</div>
           </div>
         </div>
-        <div class="tx-right" style="display:flex;align-items:center;">
-          <div class="tx-amount ${t.type === 'Income' ? 'inc' : 'exp'}">
+        <div class="tx-right">
+          <div class="tx-amt ${t.type === 'Income' ? 'inc' : 'exp'}">
             ${t.type === 'Income' ? '+' : '-'}${t.amount.toLocaleString()} Ks
           </div>
-          <button class="btn-del" onclick="deleteTx(${t.id})">✕</button>
+          <button class="btn-delete" onclick="deleteTx(${t.id})">✕</button>
         </div>
       `;
       return div;
@@ -554,24 +696,25 @@
       list.innerHTML = '';
       
       const filtered = transactions.filter(t => 
-        t.category.toLowerCase().includes(q) || 
-        (t.note && t.note.toLowerCase().includes(q))
+        t.category.toLowerCase().includes(q) || (t.note && t.note.toLowerCase().includes(q))
       );
 
       if (filtered.length === 0) {
-        list.innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px;">စာရင်းမှတ်တမ်း မရှိသေးပါ</p>';
+        list.innerHTML = '<p style="text-align:center;color:#64748b;padding:30px;">စာရင်းမှတ်တမ်း မရှိသေးပါ</p>';
         return;
       }
-
       filtered.forEach(t => list.appendChild(createTxElement(t)));
     }
 
-    function renderAnalytics(totalExp) {
+    function drawChart(totalExp) {
+      const canvas = document.getElementById('donutChart');
+      const ctx = canvas.getContext('2d');
       const container = document.getElementById('categoryBars');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       container.innerHTML = '';
 
       if (totalExp === 0) {
-        container.innerHTML = '<p style="color:#94a3b8;font-size:13px;">အသုံးစရိတ် စာရင်းမရှိသေးပါ</p>';
+        container.innerHTML = '<p style="text-align:center;color:#64748b;font-size:13px;padding:20px;">အသုံးစရိတ် စာရင်းမရှိသေးပါ</p>';
         return;
       }
 
@@ -580,17 +723,33 @@
         catMap[t.category] = (catMap[t.category] || 0) + t.amount;
       });
 
+      let startAngle = -0.5 * Math.PI;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = 80;
+
       for (const [cat, amt] of Object.entries(catMap)) {
+        const sliceAngle = (amt / totalExp) * 2 * Math.PI;
+        const meta = getCatMeta(cat);
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+        ctx.lineWidth = 26;
+        ctx.strokeStyle = meta.color;
+        ctx.stroke();
+
+        startAngle += sliceAngle;
+
         const pct = Math.round((amt / totalExp) * 100);
         const item = document.createElement('div');
-        item.className = 'cat-bar-item';
+        item.style.marginBottom = '12px';
         item.innerHTML = `
-          <div class="cat-bar-header">
-            <span>${getIcon(cat)} ${cat}</span>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;font-weight:600;">
+            <span>${meta.icon} ${cat}</span>
             <span>${amt.toLocaleString()} Ks (${pct}%)</span>
           </div>
-          <div class="progress-track">
-            <div class="progress-fill" style="width: ${pct}%;"></div>
+          <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:${meta.color};border-radius:3px;"></div>
           </div>
         `;
         container.appendChild(item);
@@ -599,14 +758,19 @@
 
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       btn.classList.add('active');
+      if (tabId === 'tabAnalytics') {
+        let exp = 0;
+        transactions.forEach(t => { if(t.type === 'Expense') exp += t.amount; });
+        drawChart(exp);
+      }
     }
 
     function exportToCSV() {
       if (transactions.length === 0) {
-        alert('ထုတ်ယူရန် စာရင်းဒေတာ မရှိပါ');
+        alert('ထုတ်ယူရန် စာရင်းမရှိပါ');
         return;
       }
       let csv = 'ID,ရက်စွဲ,အမျိုးအစား,ကဏ္ဍ,ငွေပမာဏ,မှတ်ချက်\n';
@@ -621,14 +785,13 @@
     }
 
     function clearAllData() {
-      if (confirm('သတိပြုရန်: မှတ်ထားသမျှ စာရင်းအားလုံး အပြီးအပိုင် ပျက်သွားပါမည်။ ဖျက်ရန် သေချာပါသလား?')) {
+      if (confirm('မှတ်ထားသမျှ စာရင်းအားလုံး ဖျက်ရန် သေချာပါသလား?')) {
         transactions = [];
         saveData();
         renderAll();
       }
     }
 
-    // Init
     populateCategories();
     renderAll();
   </script>
