@@ -1,496 +1,636 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="my">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Money Manager</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>My Money Manager</title>
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --expense: #ef4444;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+    }
 
-<style>
-* {
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-body {
-    background: #f4f5f7;
-    margin: 0;
-    padding: 16px 10px;
-    display: flex;
-    justify-content: center;
-}
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding-bottom: 80px;
+    }
 
-.container {
-    width: 100%;
-    max-width: 480px;
-    background: #ffffff;
-    padding: 22px 18px;
-    border-radius: 20px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
-}
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background: var(--surface);
+      position: relative;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    }
 
-h1 {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #111827;
-}
+    /* Top App Bar */
+    .app-header {
+      padding: 20px 20px 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .app-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-/* Overview Summary Cards */
-.summary {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 22px;
-}
+    /* Wallet Card */
+    .wallet-card {
+      margin: 10px 20px 20px 20px;
+      padding: 22px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border-radius: 20px;
+      color: #ffffff;
+      box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.3);
+    }
+    .wallet-card .label {
+      font-size: 13px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .wallet-card .balance {
+      font-size: 30px;
+      font-weight: 800;
+      margin: 6px 0 18px 0;
+      letter-spacing: -0.5px;
+    }
+    .wallet-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .stat-icon.inc { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .stat-icon.exp { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .stat-text .stat-val { font-size: 14px; font-weight: 700; }
+    .stat-text .stat-lbl { font-size: 11px; color: #94a3b8; }
 
-.card {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    padding: 12px 6px;
-    border-radius: 14px;
-    text-align: center;
-}
+    /* Tabs Content */
+    .tab-content {
+      display: none;
+      padding: 0 20px;
+    }
+    .tab-content.active {
+      display: block;
+    }
 
-.card b {
-    display: block;
-    font-size: 13px;
-    color: #64748b;
-    margin-bottom: 4px;
-}
+    /* Form Card */
+    .card-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+    .box-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+    .type-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 12px;
+    }
+    .type-toggle button {
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .type-toggle button.active-exp {
+      background: var(--expense);
+      color: #ffffff;
+    }
+    .type-toggle button.active-inc {
+      background: var(--primary);
+      color: #ffffff;
+    }
 
-.card .amount {
-    font-size: 14px;
-    font-weight: 700;
-}
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--primary);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 6px;
+    }
 
-#income { color: #10b981; }
-#expense { color: #ef4444; }
-#balance { color: #1e293b; }
+    /* Transaction List */
+    .tx-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+    .tx-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .tx-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .tx-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .tx-date {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .tx-right {
+      text-align: right;
+    }
+    .tx-amount {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .tx-amount.exp { color: var(--expense); }
+    .tx-amount.inc { color: var(--primary); }
+    .btn-del {
+      border: none;
+      background: transparent;
+      color: #cbd5e1;
+      font-size: 14px;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .btn-del:hover { color: var(--expense); }
 
-/* Form Inputs */
-h3 {
-    font-size: 16px;
-    color: #1e293b;
-    margin-top: 18px;
-    margin-bottom: 10px;
-}
+    /* Category Bar */
+    .cat-bar-item {
+      margin-bottom: 12px;
+    }
+    .cat-bar-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .progress-track {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--expense);
+      border-radius: 4px;
+    }
 
-label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: #475569;
-    margin-top: 10px;
-    margin-bottom: 4px;
-}
-
-input, select {
-    width: 100%;
-    padding: 11px 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    font-size: 14px;
-    outline: none;
-    background-color: #fff;
-}
-
-input:focus, select:focus {
-    border-color: #2563eb;
-}
-
-button.primary-btn {
-    width: 100%;
-    padding: 13px;
-    background: #0f172a;
-    color: #ffffff;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 16px;
-    transition: opacity 0.2s;
-}
-
-button.primary-btn:active {
-    opacity: 0.8;
-}
-
-/* Sections */
-.section-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    padding: 16px;
-    margin-top: 20px;
-    border-radius: 14px;
-}
-
-/* Transaction List */
-.transaction {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    margin-top: 10px;
-    padding: 14px;
-    border-radius: 12px;
-}
-
-.tx-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-}
-
-.tx-title {
-    font-weight: 700;
-    font-size: 15px;
-    color: #1e293b;
-}
-
-.tx-badge {
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.tx-badge.income { color: #10b981; }
-.tx-badge.expense { color: #ef4444; }
-
-.tx-sub {
-    font-size: 12px;
-    color: #64748b;
-    margin-bottom: 10px;
-}
-
-.tx-actions {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-}
-
-.btn-small {
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: none;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btn-edit { background: #e0f2fe; color: #0284c7; }
-.btn-delete { background: #fee2e2; color: #ef4444; }
-
-.backup-tools {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-.btn-backup {
-    flex: 1;
-    padding: 10px;
-    background: #e2e8f0;
-    border: none;
-    border-radius: 8px;
-    font-size: 12px;
-    cursor: pointer;
-    font-weight: 600;
-}
-</style>
+    /* Bottom Nav Bar */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 480px;
+      height: 65px;
+      background: #ffffff;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 50;
+    }
+    .nav-btn {
+      border: none;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 25%;
+    }
+    .nav-btn .nav-icon {
+      font-size: 18px;
+    }
+    .nav-btn.active {
+      color: var(--primary);
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="container">
-
-<h1>💰 My Money Manager</h1>
-
-<!-- SUMMARY -->
-<div class="summary">
-    <div class="card">
-        <b>Income</b>
-        <div class="amount" id="income">0 Ks</div>
+  <div class="app-container">
+    <!-- Header -->
+    <div class="app-header">
+      <h1>💰 My Money Manager</h1>
     </div>
-    <div class="card">
-        <b>Expense</b>
-        <div class="amount" id="expense">0 Ks</div>
-    </div>
-    <div class="card">
-        <b>Balance</b>
-        <div class="amount" id="balance">0 Ks</div>
-    </div>
-</div>
 
-<!-- ADD TRANSACTION -->
-<h3>Add Transaction</h3>
-
-<label>Date</label>
-<input type="date" id="date">
-
-<label>Type</label>
-<select id="type" onchange="updateCategories()">
-    <option value="expense">Expense (အသုံးစရိတ်)</option>
-    <option value="income">Income (ဝင်ငွေ)</option>
-</select>
-
-<label>Category</label>
-<select id="category"></select>
-
-<label>Amount (Ks)</label>
-<input type="number" id="amount" placeholder="ငွေပမာဏ ရိုက်ထည့်ပါ">
-
-<label>Note</label>
-<input type="text" id="note" placeholder="မှတ်ချက် (မဖြစ်မနေ မလိုပါ)">
-
-<button class="primary-btn" id="mainButton" onclick="addTransaction()">
-    Add Transaction
-</button>
-
-<!-- MONTHLY SUMMARY -->
-<div class="section-box">
-    <h3>📅 Monthly Summary</h3>
-    <label>Select Month</label>
-    <input type="month" id="month" onchange="monthlySummary()">
-    <div id="monthlyResult" style="margin-top: 10px; font-size: 13px;">
-        လ ရွေးချယ်ပြီး အကျဉ်းချုပ်ကို ကြည့်ရှုပါ။
-    </div>
-</div>
-
-<!-- EXPENSE CATEGORY SUMMARY -->
-<div class="section-box">
-    <h3>📊 Expense by Category</h3>
-    <div id="categoryResult" style="font-size: 13px;">
-        အထက်တွင် လ ရွေးချယ်ပေးပါ။
-    </div>
-</div>
-
-<!-- TRANSACTIONS -->
-<h3>Transactions</h3>
-
-<div style="display: flex; gap: 8px; margin-top: 6px;">
-    <select id="filter" onchange="displayTransactions()" style="flex: 1;">
-        <option value="all">အားလုံး (All)</option>
-        <option value="income">Income သီးသန့်</option>
-        <option value="expense">Expense သီးသန့်</option>
-    </select>
-</div>
-
-<input
-    type="text"
-    id="search"
-    placeholder="🔎 ရှာဖွေရန် (ရက်စွဲ၊ အမျိုးအစား၊ မှတ်ချက်)..."
-    oninput="displayTransactions()"
-    style="margin-top: 8px;"
->
-
-<div id="transactions"></div>
-
-<!-- DATA BACKUP -->
-<div class="backup-tools">
-    <button class="btn-backup" onclick="exportData()">📥 ဒေတာ Backup ဒေါင်းလုဒ်</button>
-</div>
-
-</div>
-
-<script>
-// Type အလိုက် Category စာရင်းများ
-const categoryMap = {
-    expense: ["Food & Drink", "Transport", "Shopping", "Bills", "Health", "Other"],
-    income: ["Salary", "Business", "Part-time", "Gift", "Other"]
-};
-
-let transactions = JSON.parse(localStorage.getItem("moneyTransactions")) || [];
-let editingIndex = -1;
-
-// Default Date ကို ဒီနေ့ရက်စွဲ ထည့်ပေးခြင်း
-document.getElementById("date").valueAsDate = new Date();
-
-// Type ပြောင်းရင် Category လိုက်ပြောင်းပေးခြင်း
-function updateCategories() {
-    const type = document.getElementById("type").value;
-    const catSelect = document.getElementById("category");
-    catSelect.innerHTML = "";
-    
-    categoryMap[type].forEach(cat => {
-        const opt = document.createElement("option");
-        opt.value = cat;
-        opt.textContent = cat;
-        catSelect.appendChild(opt);
-    });
-}
-updateCategories();
-
-/* ADD / EDIT TRANSACTION */
-function addTransaction() {
-    const date = document.getElementById("date").value;
-    const type = document.getElementById("type").value;
-    const category = document.getElementById("category").value;
-    const amount = Number(document.getElementById("amount").value);
-    const note = document.getElementById("note").value.trim();
-
-    if (!date) {
-        alert("ကျေးဇူးပြု၍ ရက်စွဲ ရွေးချယ်ပေးပါ။");
-        return;
-    }
-    if (amount <= 0 || isNaN(amount)) {
-        alert("ကျေးဇူးပြု၍ မှန်ကန်သော ငွေပမာဏ ရိုက်ထည့်ပါ။");
-        return;
-    }
-
-    if (editingIndex === -1) {
-        transactions.push({ date, type, category, amount, note });
-    } else {
-        transactions[editingIndex] = { date, type, category, amount, note };
-        editingIndex = -1;
-        document.getElementById("mainButton").textContent = "Add Transaction";
-    }
-
-    localStorage.setItem("moneyTransactions", JSON.stringify(transactions));
-    clearForm();
-    displayTransactions();
-    monthlySummary();
-}
-
-/* EDIT TRANSACTION */
-function editTransaction(index) {
-    const t = transactions[index];
-    document.getElementById("date").value = t.date;
-    document.getElementById("type").value = t.type;
-    updateCategories();
-    document.getElementById("category").value = t.category;
-    document.getElementById("amount").value = t.amount;
-    document.getElementById("note").value = t.note;
-
-    editingIndex = index;
-    document.getElementById("mainButton").textContent = "Save Changes";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-/* CLEAR FORM */
-function clearForm() {
-    document.getElementById("amount").value = "";
-    document.getElementById("note").value = "";
-    document.getElementById("date").valueAsDate = new Date();
-    document.getElementById("type").value = "expense";
-    updateCategories();
-}
-
-/* DISPLAY TRANSACTIONS */
-function displayTransactions() {
-    let income = 0;
-    let expense = 0;
-    const box = document.getElementById("transactions");
-    box.innerHTML = "";
-
-    const filter = document.getElementById("filter").value;
-    const search = document.getElementById("search").value.toLowerCase().trim();
-
-    // အသစ်ထည့်ထားတာ အပေါ်ဆုံးရောက်အောင် ပြောင်းပြန်စီစဉ်ခြင်း
-    transactions.forEach(function(t, index) {
-        if (t.type === "income") income += t.amount;
-        if (t.type === "expense") expense += t.amount;
-
-        if (filter !== "all" && t.type !== filter) return;
-
-        const searchText = (t.date + " " + t.type + " " + t.category + " " + t.amount + " " + t.note).toLowerCase();
-        if (search !== "" && !searchText.includes(search)) return;
-
-        const isIncome = t.type === "income";
-        const sign = isIncome ? "+" : "-";
-
-        box.innerHTML = `
-        <div class="transaction">
-            <div class="tx-header">
-                <span class="tx-title">${t.category}</span>
-                <span class="tx-badge ${t.type}">${sign}${t.amount.toLocaleString()} Ks</span>
-            </div>
-            <div class="tx-sub">
-                📅 ${t.date} ${t.note ? `• <i>${t.note}</i>` : ""}
-            </div>
-            <div class="tx-actions">
-                <button class="btn-small btn-edit" onclick="editTransaction(${index})">Edit</button>
-                <button class="btn-small btn-delete" onclick="deleteTransaction(${index})">Delete</button>
-            </div>
+    <!-- Balance Card -->
+    <div class="wallet-card">
+      <div class="label">လက်ကျန်ငွေ (Balance)</div>
+      <div class="balance" id="totalBalance">0 Ks</div>
+      <div class="wallet-stats">
+        <div class="stat-item">
+          <div class="stat-icon inc">↓</div>
+          <div class="stat-text">
+            <div class="stat-val" id="totalIncome">0 Ks</div>
+            <div class="stat-lbl">ဝင်ငွေစုစုပေါင်း</div>
+          </div>
         </div>
-        ` + box.innerHTML;
-    });
-
-    const balance = income - expense;
-    document.getElementById("income").textContent = income.toLocaleString() + " Ks";
-    document.getElementById("expense").textContent = expense.toLocaleString() + " Ks";
-    document.getElementById("balance").textContent = balance.toLocaleString() + " Ks";
-
-    if (transactions.length === 0) {
-        box.innerHTML = `<p style="text-align: center; color: #94a3b8; font-size: 13px; padding: 20px 0;">စာရင်းမှတ်တမ်း မရှိသေးပါ။</p>`;
-    }
-}
-
-/* MONTHLY SUMMARY */
-function monthlySummary() {
-    const selectedMonth = document.getElementById("month").value;
-
-    if (!selectedMonth) {
-        document.getElementById("monthlyResult").innerHTML = "လ ရွေးချယ်ပြီး အကျဉ်းချုပ်ကို ကြည့်ရှုပါ။";
-        document.getElementById("categoryResult").innerHTML = "အထက်တွင် လ ရွေးချယ်ပေးပါ။";
-        return;
-    }
-
-    let income = 0;
-    let expense = 0;
-    let categories = {};
-
-    transactions.forEach(function(t) {
-        if (t.date.startsWith(selectedMonth)) {
-            if (t.type === "income") income += t.amount;
-            if (t.type === "expense") {
-                expense += t.amount;
-                categories[t.category] = (categories[t.category] || 0) + t.amount;
-            }
-        }
-    });
-
-    const balance = income - expense;
-    document.getElementById("monthlyResult").innerHTML = `
-        <div style="line-height: 1.8;">
-            <div>💰 ဝင်ငွေ: <b style="color: #10b981;">+${income.toLocaleString()} Ks</b></div>
-            <div>💸 သုံးစွဲငွေ: <b style="color: #ef4444;">-${expense.toLocaleString()} Ks</b></div>
-            <div>📊 လက်ကျန်: <b>${balance.toLocaleString()} Ks</b></div>
+        <div class="stat-item">
+          <div class="stat-icon exp">↑</div>
+          <div class="stat-text">
+            <div class="stat-val" id="totalExpense">0 Ks</div>
+            <div class="stat-lbl">သုံးငွေစုစုပေါင်း</div>
+          </div>
         </div>
-    `;
+      </div>
+    </div>
 
-    const categoryNames = Object.keys(categories);
-    if (categoryNames.length === 0) {
-        document.getElementById("categoryResult").innerHTML = "ဒီလအတွက် သုံးစွဲငွေစာရင်း မရှိပါ။";
-    } else {
-        let categoryHTML = "<div style='line-height: 1.8;'>";
-        categoryNames.forEach(cat => {
-            categoryHTML += `<div>• <b>${cat}</b>: ${categories[cat].toLocaleString()} Ks</div>`;
-        });
-        categoryHTML += "</div>";
-        document.getElementById("categoryResult").innerHTML = categoryHTML;
+    <!-- TAB 1: HOME (Add Transaction & Recent) -->
+    <div id="tabHome" class="tab-content active">
+      <div class="card-box">
+        <div class="box-title">➕ စာရင်းအသစ် ထည့်ရန်</div>
+        
+        <div class="type-toggle">
+          <button id="btnExp" class="active-exp" onclick="setType('Expense')">အသုံးစရိတ် (Expense)</button>
+          <button id="btnInc" onclick="setType('Income')">ဝင်ငွေ (Income)</button>
+        </div>
+
+        <form id="txForm" onsubmit="addTransaction(event)">
+          <div class="form-group">
+            <label>ရက်စွဲ (Date)</label>
+            <input type="date" id="txDate" required>
+          </div>
+          <div class="form-group">
+            <label>ကဏ္ဍ (Category)</label>
+            <select id="txCat" required></select>
+          </div>
+          <div class="form-group">
+            <label>ငွေပမာဏ (Ks)</label>
+            <input type="number" id="txAmount" placeholder="ဥပမာ - ၅၀၀၀" required min="1">
+          </div>
+          <div class="form-group">
+            <label>မှတ်ချက် (Note - မဖြစ်မနေ မလိုပါ)</label>
+            <input type="text" id="txNote" placeholder="မှတ်ချက်ရေးရန်">
+          </div>
+          <button type="submit" class="btn-submit">စာရင်းသိမ်းမည်</button>
+        </form>
+      </div>
+
+      <div class="box-title" style="margin: 10px 0 12px 4px;">နောက်ဆုံးမှတ်တမ်းများ</div>
+      <div id="recentList"></div>
+    </div>
+
+    <!-- TAB 2: HISTORY (Full List with Search) -->
+    <div id="tabHistory" class="tab-content">
+      <div class="form-group">
+        <input type="text" id="searchBox" placeholder="🔍 စာရင်းမှတ်ချက် သို့မဟုတ် ကဏ္ဍ ရှာရန်..." oninput="renderHistory()">
+      </div>
+      <div id="fullHistoryList"></div>
+    </div>
+
+    <!-- TAB 3: ANALYTICS -->
+    <div id="tabAnalytics" class="tab-content">
+      <div class="card-box">
+        <div class="box-title">📊 ကဏ္ဍအလိုက် အသုံးစရိတ် အချိုးအစား</div>
+        <div id="categoryBars"></div>
+      </div>
+    </div>
+
+    <!-- TAB 4: SETTINGS / BACKUP -->
+    <div id="tabSettings" class="tab-content">
+      <div class="card-box">
+        <div class="box-title">💾 ဒေတာသိမ်းဆည်းခြင်း (Data Backup)</div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+          ဖုန်းပျောက်သွားလျှင် သို့မဟုတ် စက်ပြောင်းလျှင် စာရင်းများ မပျောက်သွားစေရန် Excel / CSV ဖိုင်အဖြစ် ဒေါင်းလုဒ်ရယူထားနိုင်ပါသည်။
+        </p>
+        <button class="btn-submit" onclick="exportToCSV()" style="background: #0284c7; margin-bottom: 10px;">📥 CSV (Excel) သို့ Export ထုတ်ယူမည်</button>
+        <button class="btn-submit" onclick="clearAllData()" style="background: #ef4444;">🗑️ စာရင်းအားလုံး ဖျက်မည် (Reset)</button>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <button class="nav-btn active" onclick="switchTab('tabHome', this)">
+        <span class="nav-icon">🏠</span>
+        <span>ပင်မ</span>
+      </button>
+      <button class="nav-btn" onclick="switchTab('tabHistory', this)">
+        <span class="nav-icon">📜</span>
+        <span>မှတ်တမ်း</span>
+      </button>
+      <button class="nav-btn" onclick="switchTab('tabAnalytics', this)">
+        <span class="nav-icon">📊</span>
+        <span>သုံးသပ်ချက်</span>
+      </button>
+      <button class="nav-btn" onclick="switchTab('tabSettings', this)">
+        <span class="nav-icon">⚙️</span>
+        <span>ဆက်တင်</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const categories = {
+      Expense: [
+        { name: "အစားအသောက်", icon: "🍔" },
+        { name: "သွားလာစရိတ်", icon: "🚗" },
+        { name: "ဈေးဝယ်စရိတ်", icon: "🛍️" },
+        { name: "မီး/ဖုန်းဘေလ်", icon: "💡" },
+        { name: "ကျန်းမာရေး", icon: "🏥" },
+        { name: "အထွေထွေသုံး", icon: "📦" }
+      ],
+      Income: [
+        { name: "လစာ", icon: "💼" },
+        { name: "အပိုဝင်ငွေ", icon: "💵" },
+        { name: "မုန့်ဖိုး/လက်ဆောင်", icon: "🎁" },
+        { name: "အရောင်းအဝယ်", icon: "🏪" }
+      ]
+    };
+
+    let currentType = 'Expense';
+    let transactions = JSON.parse(localStorage.getItem('money_records') || localStorage.getItem('transactions') || '[]');
+
+    document.getElementById('txDate').valueAsDate = new Date();
+
+    function setType(type) {
+      currentType = type;
+      document.getElementById('btnExp').className = type === 'Expense' ? 'active-exp' : '';
+      document.getElementById('btnInc').className = type === 'Income' ? 'active-inc' : '';
+      populateCategories();
     }
-}
 
-/* DELETE TRANSACTION */
-function deleteTransaction(index) {
-    if (confirm("ဒီစာရင်းကို ဖျက်မှာ သေချာပါသလား?")) {
-        transactions.splice(index, 1);
-        localStorage.setItem("moneyTransactions", JSON.stringify(transactions));
-        displayTransactions();
-        monthlySummary();
+    function populateCategories() {
+      const select = document.getElementById('txCat');
+      select.innerHTML = '';
+      categories[currentType].forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.name;
+        opt.textContent = `${c.icon} ${c.name}`;
+        select.appendChild(opt);
+      });
     }
-}
 
-/* EXPORT DATA */
-function exportData() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(transactions, null, 2));
-    const dlAnchor = document.createElement("a");
-    dlAnchor.setAttribute("href", dataStr);
-    dlAnchor.setAttribute("download", `money_backup_${new Date().toISOString().slice(0,10)}.json`);
-    dlAnchor.click();
-}
+    function addTransaction(e) {
+      e.preventDefault();
+      const amount = parseFloat(document.getElementById('txAmount').value);
+      const category = document.getElementById('txCat').value;
+      const date = document.getElementById('txDate').value;
+      const note = document.getElementById('txNote').value.trim();
 
-// စတင် run ချိန်
-displayTransactions();
-</script>
+      const newTx = {
+        id: Date.now(),
+        type: currentType,
+        amount,
+        category,
+        date,
+        note
+      };
 
+      transactions.unshift(newTx);
+      saveData();
+      document.getElementById('txAmount').value = '';
+      document.getElementById('txNote').value = '';
+      renderAll();
+    }
+
+    function deleteTx(id) {
+      if (confirm('ဤစာရင်းကို ဖျက်ရန် သေချာပါသလား?')) {
+        transactions = transactions.filter(t => t.id !== id);
+        saveData();
+        renderAll();
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem('money_records', JSON.stringify(transactions));
+    }
+
+    function getIcon(catName) {
+      for (const t of ['Expense', 'Income']) {
+        const found = categories[t].find(c => c.name === catName);
+        if (found) return found.icon;
+      }
+      return '💰';
+    }
+
+    function renderAll() {
+      let totalInc = 0, totalExp = 0;
+      transactions.forEach(t => {
+        if (t.type === 'Income') totalInc += t.amount;
+        else totalExp += t.amount;
+      });
+
+      const balance = totalInc - totalExp;
+      document.getElementById('totalBalance').textContent = `${balance.toLocaleString()} Ks`;
+      document.getElementById('totalIncome').textContent = `${totalInc.toLocaleString()} Ks`;
+      document.getElementById('totalExpense').textContent = `${totalExp.toLocaleString()} Ks`;
+
+      // Recent List (top 5)
+      const recentList = document.getElementById('recentList');
+      recentList.innerHTML = '';
+      transactions.slice(0, 5).forEach(t => {
+        recentList.appendChild(createTxElement(t));
+      });
+
+      renderHistory();
+      renderAnalytics(totalExp);
+    }
+
+    function createTxElement(t) {
+      const div = document.createElement('div');
+      div.className = 'tx-item';
+      div.innerHTML = `
+        <div class="tx-left">
+          <div class="tx-icon">${getIcon(t.category)}</div>
+          <div>
+            <div class="tx-name">${t.category} ${t.note ? `<span style="font-weight:normal;color:#64748b;">(${t.note})</span>` : ''}</div>
+            <div class="tx-date">${t.date}</div>
+          </div>
+        </div>
+        <div class="tx-right" style="display:flex;align-items:center;">
+          <div class="tx-amount ${t.type === 'Income' ? 'inc' : 'exp'}">
+            ${t.type === 'Income' ? '+' : '-'}${t.amount.toLocaleString()} Ks
+          </div>
+          <button class="btn-del" onclick="deleteTx(${t.id})">✕</button>
+        </div>
+      `;
+      return div;
+    }
+
+    function renderHistory() {
+      const q = (document.getElementById('searchBox')?.value || '').toLowerCase();
+      const list = document.getElementById('fullHistoryList');
+      list.innerHTML = '';
+      
+      const filtered = transactions.filter(t => 
+        t.category.toLowerCase().includes(q) || 
+        (t.note && t.note.toLowerCase().includes(q))
+      );
+
+      if (filtered.length === 0) {
+        list.innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px;">စာရင်းမှတ်တမ်း မရှိသေးပါ</p>';
+        return;
+      }
+
+      filtered.forEach(t => list.appendChild(createTxElement(t)));
+    }
+
+    function renderAnalytics(totalExp) {
+      const container = document.getElementById('categoryBars');
+      container.innerHTML = '';
+
+      if (totalExp === 0) {
+        container.innerHTML = '<p style="color:#94a3b8;font-size:13px;">အသုံးစရိတ် စာရင်းမရှိသေးပါ</p>';
+        return;
+      }
+
+      const catMap = {};
+      transactions.filter(t => t.type === 'Expense').forEach(t => {
+        catMap[t.category] = (catMap[t.category] || 0) + t.amount;
+      });
+
+      for (const [cat, amt] of Object.entries(catMap)) {
+        const pct = Math.round((amt / totalExp) * 100);
+        const item = document.createElement('div');
+        item.className = 'cat-bar-item';
+        item.innerHTML = `
+          <div class="cat-bar-header">
+            <span>${getIcon(cat)} ${cat}</span>
+            <span>${amt.toLocaleString()} Ks (${pct}%)</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: ${pct}%;"></div>
+          </div>
+        `;
+        container.appendChild(item);
+      }
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    function exportToCSV() {
+      if (transactions.length === 0) {
+        alert('ထုတ်ယူရန် စာရင်းဒေတာ မရှိပါ');
+        return;
+      }
+      let csv = 'ID,ရက်စွဲ,အမျိုးအစား,ကဏ္ဍ,ငွေပမာဏ,မှတ်ချက်\n';
+      transactions.forEach(t => {
+        csv += `"${t.id}","${t.date}","${t.type}","${t.category}","${t.amount}","${t.note || ''}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `money_manager_backup_${new Date().toISOString().slice(0,10)}.csv`;
+      link.click();
+    }
+
+    function clearAllData() {
+      if (confirm('သတိပြုရန်: မှတ်ထားသမျှ စာရင်းအားလုံး အပြီးအပိုင် ပျက်သွားပါမည်။ ဖျက်ရန် သေချာပါသလား?')) {
+        transactions = [];
+        saveData();
+        renderAll();
+      }
+    }
+
+    // Init
+    populateCategories();
+    renderAll();
+  </script>
 </body>
 </html>
