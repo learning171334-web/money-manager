@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Money Manager Pro</title>
+
+  <!-- Google tag (gtag.js) - GA4 ID ထည့်ရန်နေရာ -->
+  <!--
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+  -->
+
   <style>
     :root {
       --bg: #0b0f19;
@@ -18,6 +30,7 @@
       --text: #f8fafc;
       --text-dim: #94a3b8;
       --accent: #38bdf8;
+      --warning: #f59e0b;
     }
 
     * {
@@ -66,9 +79,10 @@
       padding: 4px 10px;
       border-radius: 20px;
       font-weight: 600;
+      cursor: pointer;
     }
 
-    /* Time Range Filter Bar */
+    /* Filter Bar */
     .filter-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -93,7 +107,7 @@
       box-shadow: 0 2px 10px var(--primary-glow);
     }
 
-    /* Main Balance Card */
+    /* Balance Card */
     .balance-card {
       margin: 0 18px 18px 18px;
       padding: 22px;
@@ -102,7 +116,6 @@
       border: 1px solid var(--card-border);
       backdrop-filter: blur(16px);
       box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.6);
-      position: relative;
     }
     .balance-title {
       font-size: 12px;
@@ -113,7 +126,7 @@
       justify-content: space-between;
     }
     .balance-num {
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 800;
       margin: 8px 0 16px 0;
       letter-spacing: -0.5px;
@@ -125,11 +138,7 @@
       padding-top: 14px;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .stat-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .stat-pill { display: flex; align-items: center; gap: 8px; }
     .stat-icon {
       width: 32px;
       height: 32px;
@@ -145,7 +154,30 @@
     .stat-label { font-size: 11px; color: var(--text-dim); }
     .stat-val { font-size: 13px; font-weight: 700; margin-top: 2px; }
 
-    /* Containers */
+    /* Survival Mode Alert Banner */
+    .survival-banner {
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.2), rgba(245, 158, 11, 0.15));
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .survival-banner h4 {
+      font-size: 13px;
+      color: #fca5a5;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .survival-banner p {
+      font-size: 11px;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+
+    /* Tabs */
     .tab-content { display: none; padding: 0 18px; }
     .tab-content.active { display: block; }
 
@@ -213,12 +245,7 @@
     }
     .input-field:focus { border-color: var(--primary); }
 
-    .quick-chips {
-      display: flex;
-      gap: 6px;
-      margin-top: 8px;
-      flex-wrap: wrap;
-    }
+    .quick-chips { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
     .chip {
       padding: 5px 10px;
       background: rgba(255, 255, 255, 0.06);
@@ -282,7 +309,63 @@
       padding: 4px;
     }
 
-    /* Settled badge */
+    /* Jar Cards & Progress */
+    .jar-card {
+      background: rgba(11, 15, 25, 0.5);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      transition: all 0.3s;
+    }
+    .jar-card.frozen {
+      opacity: 0.45;
+      border-style: dashed;
+    }
+    .jar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .jar-badges {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .badge-tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+    .badge-spill { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
+    .badge-loan { background: rgba(244, 63, 94, 0.15); color: var(--expense); }
+    .badge-frozen { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
+
+    .jar-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .jar-bar-bg {
+      height: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .jar-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    /* Badges */
     .badge-settled {
       font-size: 10px;
       padding: 2px 7px;
@@ -290,7 +373,6 @@
       color: var(--primary);
       border-radius: 10px;
       font-weight: 700;
-      margin-left: 6px;
     }
     .badge-pending {
       font-size: 10px;
@@ -299,15 +381,6 @@
       color: var(--debt-borrow);
       border-radius: 10px;
       font-weight: 700;
-      margin-left: 6px;
-    }
-
-    /* Donut Canvas */
-    .chart-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 10px 0;
     }
 
     /* Bottom Nav */
@@ -317,7 +390,7 @@
       width: 100%;
       max-width: 440px;
       height: 70px;
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.96);
       backdrop-filter: blur(20px);
       border-top: 1px solid var(--card-border);
       display: flex;
@@ -370,7 +443,7 @@
 </head>
 <body>
 
-  <!-- PIN Screen -->
+  <!-- PIN Lock Screen -->
   <div id="lockScreen">
     <div style="font-size: 38px; margin-bottom: 8px;">🔒</div>
     <h2 style="font-size: 17px;">လုံခြုံရေး PIN ကုတ် ရိုက်ထည့်ပါ</h2>
@@ -434,8 +507,14 @@
       </div>
     </div>
 
-    <!-- TAB 1: HOME (Add Transaction) -->
+    <!-- TAB 1: HOME (စာရင်းသွင်း) -->
     <div id="tabHome" class="tab-content active">
+      <!-- Survival Mode Alert -->
+      <div class="survival-banner" id="homeSurvivalBanner">
+        <h4>🛡️ ငွေကြေး အကာအကွယ်စနစ် (Survival Mode)</h4>
+        <p id="survivalText">လက်ရှိ ဝင်ငွေသည် အခြေခံ စားဝတ်နေရေးအတွက် လိုအပ်ချက်ထက် နည်းနေပါသဖြင့် အပျော်အပါးနှင့် လိုချင်တာ အိုးများကို စနစ်က ယာယီ Freeze ပိတ်ထားပေးပါသည်။</p>
+      </div>
+
       <div class="glass-box">
         <div class="type-switcher">
           <button id="btnExp" class="type-btn active-exp" onclick="setType('Expense')">အသုံးစရိတ်</button>
@@ -448,7 +527,7 @@
             <input type="date" id="txDate" class="input-field" required>
           </div>
           <div class="input-group">
-            <label>ကဏ္ဍ (အမျိုးအစား)</label>
+            <label>အိုးအမျိုးအစား (ကဏ္ဍ)</label>
             <select id="txCat" class="input-field" required></select>
           </div>
           <div class="input-group">
@@ -463,7 +542,7 @@
           </div>
           <div class="input-group">
             <label>မှတ်ချက် (Note)</label>
-            <input type="text" id="txNote" class="input-field" placeholder="ဥပမာ - သူငယ်ချင်းများနှင့် မုန့်စား">
+            <input type="text" id="txNote" class="input-field" placeholder="ဥပမာ - နေ့လယ်စာ စားသည်">
           </div>
           <button type="submit" class="btn-action">စာရင်းသွင်းမည် 💾</button>
         </form>
@@ -475,7 +554,24 @@
       <div id="recentList"></div>
     </div>
 
-    <!-- TAB 2: HISTORY -->
+    <!-- TAB 2: JARS (အိုး ၆ လုံး ဘတ်ဂျက် စီမံခန့်ခွဲမှု) -->
+    <div id="tabJars" class="tab-content">
+      <div class="glass-box">
+        <div class="box-heading">
+          <span>🏺 အိုး ၆ လုံး စမတ်စနစ်</span>
+          <span style="font-size: 11px; color: var(--accent); cursor: pointer;" onclick="switchTab('tabSettings', document.getElementById('navSettings'))">⚙️ ဆက်တင်</span>
+        </div>
+        
+        <!-- Jar Loan Banner if any -->
+        <div id="jarLoanBanner" style="display:none; padding:10px 12px; background:rgba(244,63,94,0.15); border:1px solid rgba(244,63,94,0.3); border-radius:12px; font-size:11px; margin-bottom:12px;">
+          ⚠️ <b>အိုးတွင်း အကြွေး:</b> အပျော်အပါးအိုးမှ စုငွေအိုးထံသို့ ပြန်ဆပ်ရန် <span id="jarLoanAmt" style="font-weight:700; color:var(--expense);">0</span> Ks ကျန်ရှိနေပါသည်။ (လစာဝင်ချိန်တွင် အလိုအလျောက် ဖြတ်ဆပ်ပါမည်)
+        </div>
+
+        <div id="jarsDisplayList"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: HISTORY (မှတ်တမ်းရှာဖွေ) -->
     <div id="tabHistory" class="tab-content">
       <div class="glass-box" style="padding: 12px;">
         <input type="text" id="searchBox" class="input-field" placeholder="🔍 စာရင်းမှတ်ချက် သို့မဟုတ် ကဏ္ဍ ရှာရန်..." oninput="renderHistory()">
@@ -483,7 +579,7 @@
       <div id="fullHistoryList"></div>
     </div>
 
-    <!-- TAB 3: DEBT / IOU TRACKER (ချေးငွေနှင့် ရရန်ငွေ) -->
+    <!-- TAB 4: DEBT (ချေးငွေနှင့် ရရန်ငွေ) -->
     <div id="tabDebt" class="tab-content">
       <div class="glass-box">
         <div class="box-heading">🤝 ချေးငွေ / ရငွေ အသစ်မှတ်မည်</div>
@@ -529,36 +625,43 @@
       <div id="debtList"></div>
     </div>
 
-    <!-- TAB 4: ANALYTICS (Charts) -->
-    <div id="tabAnalytics" class="tab-content">
+    <!-- TAB 5: SETTINGS (ဆက်တင်) -->
+    <div id="tabSettings" class="tab-content">
+      <!-- Minimum Necessities Threshold (Survival Mode Trigger) -->
+      <div class="glass-box">
+        <div class="box-heading">🛡️ အနိမ့်ဆုံး စားဝတ်နေရေးသတ်မှတ်ချက် (Survival Target)</div>
+        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;">
+          လစဉ် ဝင်ငွေသည် ဤပမာဏအောက် လျော့နည်းပါက အပျော်အပါးနှင့် လိုချင်တာ အိုးများကို အလိုအလျောက် ပိတ် (Freeze) ထားပေးမည်။
+        </p>
+        <input type="number" id="minNecInput" class="input-field" placeholder="ဥပမာ - 200000" onchange="saveMinNec(this.value)">
+      </div>
+
+      <!-- Spillover Target Cap Setting -->
+      <div class="glass-box">
+        <div class="box-heading">🌊 စုငွေအိုး ပြည့်မှတ်သတ်မှတ်ချက် (Spillover Cap)</div>
+        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;">
+          စုငွေအိုးထဲတွင် ဤငွေပမာဏ ပြည့်သွားပါက ပိုလျှံငွေများကို ရင်းနှီးမြှုပ်နှံမှု အိုးထဲသို့ အလိုအလျောက် စီးဝင်စေမည်။
+        </p>
+        <input type="number" id="spilloverCapInput" class="input-field" placeholder="ဥပမာ - 1000000" onchange="saveSpilloverCap(this.value)">
+      </div>
+
+      <!-- 6 Jars Percentage Sliders -->
       <div class="glass-box">
         <div class="box-heading">
-          <span>📊 အသုံးစရိတ် စက်ဝိုင်းပြဇယား</span>
+          <span>🏺 အိုး ၆ လုံး ရာခိုင်နှုန်း သတ်မှတ်ချက်</span>
+          <span id="jarTotalPct" style="font-size: 12px; font-weight: 800; color: var(--primary);">100%</span>
         </div>
-        <div class="chart-container">
-          <canvas id="donutChart" width="220" height="220"></canvas>
-        </div>
-        <div id="categoryBars"></div>
+        <div id="jarSlidersContainer"></div>
+        <button class="btn-action" onclick="saveJarPercentages()" style="background: #334155; margin-top: 10px; padding: 10px;">ရာခိုင်နှုန်း အတည်ပြု သိမ်းဆည်းမည် ✓</button>
       </div>
-    </div>
 
-    <!-- TAB 5: SETTINGS -->
-    <div id="tabSettings" class="tab-content">
       <div class="glass-box">
         <div class="box-heading">📅 လစာထုတ်ရက် သတ်မှတ်ချက် (Payday Cycle)</div>
-        <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 10px;">
-          လစဉ် လစာထုတ်သည့်ရက်ကို ရွေးထားပါက ထိုရက်မှစ၍ နောက်လ ထိုရက်မတိုင်မီအထိကို "ဒီလစာရင်း" အဖြစ် စာရင်းချုပ်ပေးပါမည်။
-        </p>
-        <div style="display:flex; gap:10px; align-items:center;">
-          <select id="paydaySelect" class="input-field" onchange="changePayday(this.value)">
-            <!-- Options populated by JS -->
-          </select>
-        </div>
+        <select id="paydaySelect" class="input-field" onchange="changePayday(this.value)"></select>
       </div>
 
       <div class="glass-box">
         <div class="box-heading">🔒 လုံခြုံရေး PIN ကုတ်</div>
-        <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 10px;">App ဖွင့်တိုင်း လျှို့ဝှက်ကုဒ် ခတ်ထားရန်။</p>
         <button class="btn-action" onclick="configurePin()" style="background: #334155; margin-bottom: 8px;" id="pinStatusBtn">PIN ကုဒ် သတ်မှတ်မည်</button>
       </div>
 
@@ -569,19 +672,19 @@
       </div>
     </div>
 
-    <!-- Bottom Nav -->
+    <!-- Bottom Navigation Bar -->
     <div class="navbar">
       <button class="nav-item active" onclick="switchTab('tabHome', this)">
         <span class="icon">🏠</span><span>ပင်မ</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('tabJars', this)">
+        <span class="icon">🏺</span><span>အိုး ၆ လုံး</span>
       </button>
       <button class="nav-item" onclick="switchTab('tabHistory', this)">
         <span class="icon">📜</span><span>မှတ်တမ်း</span>
       </button>
       <button class="nav-item" onclick="switchTab('tabDebt', this)">
         <span class="icon">🤝</span><span>ချေးငွေ</span>
-      </button>
-      <button class="nav-item" onclick="switchTab('tabAnalytics', this)">
-        <span class="icon">📊</span><span>ဇယား</span>
       </button>
       <button class="nav-item" id="navSettings" onclick="switchTab('tabSettings', this)">
         <span class="icon">⚙️</span><span>ဆက်တင်</span>
@@ -590,43 +693,51 @@
   </div>
 
   <script>
-    // Categories with new additions: Entertainment & Investment
-    const categories = {
-      Expense: [
-        { name: "အစားအသောက်", icon: "🍔", color: "#f43f5e" },
-        { name: "သွားလာစရိတ်", icon: "🚗", color: "#fb923c" },
-        { name: "အပျော်အပါး/ဖျော်ဖြေရေး", icon: "🎉", color: "#ec4899" },
-        { name: "ရင်းနှီးမြှုပ်နှံမှု", icon: "📈", color: "#8b5cf6" },
-        { name: "ငွေစုခြင်း", icon: "🏦", color: "#06b6d4" },
-        { name: "ဈေးဝယ်ခြင်း", icon: "🛍️", color: "#a855f7" },
-        { name: "မီး/ဖုန်းဘေလ်", icon: "💡", color: "#eab308" },
-        { name: "ကျန်းမာရေး", icon: "🏥", color: "#14b8a6" },
-        { name: "အထွေထွေ", icon: "📦", color: "#64748b" }
-      ],
-      Income: [
-        { name: "လစာ", icon: "💼", color: "#10b981" },
-        { name: "ရင်းနှီးမြှုပ်နှံမှု အမြတ်", icon: "📈", color: "#34d399" },
-        { name: "အပိုဝင်ငွေ", icon: "💵", color: "#38bdf8" },
-        { name: "လက်ဆောင်/မုန့်ဖိုး", icon: "🎁", color: "#f472b6" },
-        { name: "အရောင်းအဝယ်", icon: "🏪", color: "#818cf8" }
-      ]
-    };
+    // 6 Core Jars Definition
+    const defaultJars = [
+      { id: "nec", name: "မဖြစ်မနေစရိတ်", icon: "🏠", color: "#f43f5e", defaultPct: 40 },
+      { id: "inv", name: "ရင်းနှီးမြှုပ်နှံမှု", icon: "📈", color: "#10b981", defaultPct: 15 },
+      { id: "play", name: "အပျော်အပါးစရိတ်", icon: "🎉", color: "#ec4899", defaultPct: 10 },
+      { id: "wants", name: "လိုချင်တာအတွက်", icon: "🛍️", color: "#a855f7", defaultPct: 10 },
+      { id: "ltss", name: "ရေရှည်အတွက်", icon: "⏳", color: "#38bdf8", defaultPct: 15 },
+      { id: "save", name: "စုငွေ", icon: "🏦", color: "#06b6d4", defaultPct: 10 }
+    ];
+
+    const incomeCategories = [
+      { name: "လစာ", icon: "💼", color: "#10b981" },
+      { name: "ရင်းနှီးမြှုပ်နှံမှု အမြတ်", icon: "📈", color: "#34d399" },
+      { name: "အပိုဝင်ငွေ/Freelance", icon: "💵", color: "#38bdf8" },
+      { name: "မုန့်ဖိုး/လက်ဆောင်", icon: "🎁", color: "#f472b6" },
+      { name: "အရောင်းအဝယ်", icon: "🏪", color: "#818cf8" }
+    ];
 
     let currentType = 'Expense';
     let currentDebtType = 'Lent';
-    let currentTimeFilter = 'month'; // '7d', 'month', 'year', 'all'
+    let currentTimeFilter = 'month';
     let payday = parseInt(localStorage.getItem('payday_start') || '1');
+    let minNecThreshold = parseFloat(localStorage.getItem('min_nec_threshold') || '200000');
+    let spilloverCap = parseFloat(localStorage.getItem('spillover_cap') || '1000000');
+    let jarLoanOwed = parseFloat(localStorage.getItem('jar_loan_owed') || '0');
 
     let transactions = JSON.parse(localStorage.getItem('money_records') || '[]');
     let debtRecords = JSON.parse(localStorage.getItem('debt_records') || '[]');
     let userPin = localStorage.getItem('app_pin') || '';
     let enteredPin = '';
 
+    // Load Jar Percentages
+    let jarPercentages = JSON.parse(localStorage.getItem('jar_percentages') || 'null');
+    if (!jarPercentages) {
+      jarPercentages = {};
+      defaultJars.forEach(j => jarPercentages[j.id] = j.defaultPct);
+    }
+
     const todayStr = new Date().toISOString().slice(0, 10);
     document.getElementById('txDate').value = todayStr;
     document.getElementById('debtDate').value = todayStr;
+    document.getElementById('minNecInput').value = minNecThreshold;
+    document.getElementById('spilloverCapInput').value = spilloverCap;
 
-    // Initialize Payday Select Options (1 to 28)
+    // Initialize Payday Dropdown
     const paydaySelect = document.getElementById('paydaySelect');
     for (let i = 1; i <= 28; i++) {
       const opt = document.createElement('option');
@@ -638,9 +749,7 @@
     updatePaydayBadge();
 
     // Check PIN Lock
-    if (userPin) {
-      document.getElementById('lockScreen').style.display = 'flex';
-    }
+    if (userPin) document.getElementById('lockScreen').style.display = 'flex';
 
     function pressPin(val) {
       if (val === 'del') enteredPin = enteredPin.slice(0, -1);
@@ -708,6 +817,18 @@
       renderAll();
     }
 
+    function saveMinNec(val) {
+      minNecThreshold = parseFloat(val) || 0;
+      localStorage.setItem('min_nec_threshold', minNecThreshold);
+      renderAll();
+    }
+
+    function saveSpilloverCap(val) {
+      spilloverCap = parseFloat(val) || 0;
+      localStorage.setItem('spillover_cap', spilloverCap);
+      renderAll();
+    }
+
     function setType(type) {
       currentType = type;
       document.getElementById('btnExp').className = `type-btn ${type === 'Expense' ? 'active-exp' : ''}`;
@@ -731,12 +852,21 @@
     function populateCategories() {
       const select = document.getElementById('txCat');
       select.innerHTML = '';
-      categories[currentType].forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.name;
-        opt.textContent = `${c.icon} ${c.name}`;
-        select.appendChild(opt);
-      });
+      if (currentType === 'Expense') {
+        defaultJars.forEach(j => {
+          const opt = document.createElement('option');
+          opt.value = j.name;
+          opt.textContent = `${j.icon} ${j.name}`;
+          select.appendChild(opt);
+        });
+      } else {
+        incomeCategories.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.name;
+          opt.textContent = `${c.icon} ${c.name}`;
+          select.appendChild(opt);
+        });
+      }
     }
 
     function addAmount(val) {
@@ -744,7 +874,6 @@
       input.value = (parseFloat(input.value || 0) + val);
     }
 
-    // Date Range calculation based on Payday Cycle
     function getPaydayMonthRange(targetDate = new Date()) {
       const y = targetDate.getFullYear();
       const m = targetDate.getMonth();
@@ -796,6 +925,22 @@
       const date = document.getElementById('txDate').value;
       const note = document.getElementById('txNote').value.trim();
 
+      // Check if Play jar is exceeding and create Jar Loan record
+      if (currentType === 'Expense' && category === 'အပျော်အပါးစရိတ်') {
+        const currentFiltered = filterTransactionsByTime(transactions);
+        let totalInc = 0;
+        currentFiltered.filter(t => t.type === 'Income').forEach(t => totalInc += t.amount);
+        const playQuota = (totalInc * (jarPercentages['play'] || 10)) / 100;
+        let playSpent = 0;
+        currentFiltered.filter(t => t.type === 'Expense' && t.category === 'အပျော်အပါးစရိတ်').forEach(t => playSpent += t.amount);
+
+        if (playSpent + amount > playQuota && playQuota > 0) {
+          const overAmt = (playSpent + amount) - playQuota;
+          jarLoanOwed += amount;
+          localStorage.setItem('jar_loan_owed', jarLoanOwed);
+        }
+      }
+
       transactions.unshift({ id: Date.now(), type: currentType, amount, category, date, note });
       saveData();
 
@@ -813,7 +958,7 @@
       }
     }
 
-    // DEBT / IOU Operations
+    // Debt Functions
     function addDebtRecord(e) {
       e.preventDefault();
       const person = document.getElementById('debtPerson').value.trim();
@@ -821,15 +966,7 @@
       const date = document.getElementById('debtDate').value;
       const note = document.getElementById('debtNote').value.trim();
 
-      debtRecords.unshift({
-        id: Date.now(),
-        type: currentDebtType,
-        person,
-        amount,
-        date,
-        note,
-        settled: false
-      });
+      debtRecords.unshift({ id: Date.now(), type: currentDebtType, person, amount, date, note, settled: false });
       saveDebtData();
 
       document.getElementById('debtPerson').value = '';
@@ -855,19 +992,169 @@
       }
     }
 
-    function saveData() {
-      localStorage.setItem('money_records', JSON.stringify(transactions));
-    }
-    function saveDebtData() {
-      localStorage.setItem('debt_records', JSON.stringify(debtRecords));
-    }
+    function saveData() { localStorage.setItem('money_records', JSON.stringify(transactions)); }
+    function saveDebtData() { localStorage.setItem('debt_records', JSON.stringify(debtRecords)); }
 
     function getCatMeta(catName) {
-      for (const t of ['Expense', 'Income']) {
-        const found = categories[t].find(c => c.name === catName);
-        if (found) return found;
-      }
+      const jar = defaultJars.find(j => j.name === catName);
+      if (jar) return jar;
+      const inc = incomeCategories.find(c => c.name === catName);
+      if (inc) return inc;
       return { icon: '💰', color: '#94a3b8' };
+    }
+
+    // 4 Core Rules Calculation & Render
+    function renderJarsTab(totalInc, currentFilteredList) {
+      const container = document.getElementById('jarsDisplayList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Rule 2: Survival Mode Check
+      const isSurvival = totalInc < minNecThreshold;
+      const banner = document.getElementById('homeSurvivalBanner');
+      if (isSurvival) {
+        banner.style.display = 'block';
+        document.getElementById('survivalText').textContent = 
+          `လက်ရှိ ဝင်ငွေ (${totalInc.toLocaleString()} Ks) သည် အနိမ့်ဆုံး စားဝတ်နေရေးသတ်မှတ်ချက် (${minNecThreshold.toLocaleString()} Ks) မပြည့်မီသေးပါ။ အပျော်အပါးနှင့် လိုချင်တာ အိုးများကို ယာယီ Freeze လုပ်ထားပါသည်။`;
+      } else {
+        banner.style.display = 'none';
+      }
+
+      // Rule 4: Jar Loan Banner Update
+      const loanBanner = document.getElementById('jarLoanBanner');
+      if (jarLoanOwed > 0) {
+        loanBanner.style.display = 'block';
+        document.getElementById('jarLoanAmt').textContent = jarLoanOwed.toLocaleString();
+      } else {
+        loanBanner.style.display = 'none';
+      }
+
+      // Check cumulative savings for Spillover (Rule 3)
+      let cumulativeSavings = 0;
+      transactions.filter(t => t.category === 'စုငွေ').forEach(t => {
+        if (t.type === 'Income') cumulativeSavings += t.amount;
+        else cumulativeSavings -= t.amount;
+      });
+      const isSavingsMaxed = cumulativeSavings >= spilloverCap && spilloverCap > 0;
+
+      defaultJars.forEach(j => {
+        let pct = jarPercentages[j.id] || j.defaultPct;
+        let isFrozen = false;
+        let isSpilloverActive = false;
+
+        // Apply Survival Mode: Freeze Play and Wants (Rule 2)
+        if (isSurvival && (j.id === 'play' || j.id === 'wants')) {
+          pct = 0;
+          isFrozen = true;
+        }
+
+        // Apply Auto-Spillover: If savings capped, spillover to investments (Rule 3)
+        if (isSavingsMaxed && j.id === 'save') {
+          pct = 0;
+          isSpilloverActive = true;
+        } else if (isSavingsMaxed && j.id === 'inv') {
+          pct += (jarPercentages['save'] || 10);
+        }
+
+        let allocatedQuota = (totalInc * pct) / 100;
+
+        // Apply Jar Loan Auto-Repay from Play quota (Rule 4)
+        if (j.id === 'play' && jarLoanOwed > 0 && allocatedQuota > 0) {
+          if (allocatedQuota >= jarLoanOwed) {
+            allocatedQuota -= jarLoanOwed;
+            jarLoanOwed = 0;
+            localStorage.setItem('jar_loan_owed', 0);
+          } else {
+            jarLoanOwed -= allocatedQuota;
+            localStorage.setItem('jar_loan_owed', jarLoanOwed);
+            allocatedQuota = 0;
+          }
+        }
+
+        let spent = 0;
+        currentFilteredList.filter(t => t.type === 'Expense' && t.category === j.name).forEach(t => spent += t.amount);
+
+        const remaining = allocatedQuota - spent;
+        const progressPct = allocatedQuota > 0 ? Math.min(Math.round((spent / allocatedQuota) * 100), 100) : 0;
+        const isOver = spent > allocatedQuota && allocatedQuota > 0;
+
+        const card = document.createElement('div');
+        card.className = `jar-card ${isFrozen ? 'frozen' : ''}`;
+        card.innerHTML = `
+          <div class="jar-header">
+            <span>${j.icon} ${j.name} (${pct}%)</span>
+            <span style="color: ${isOver ? 'var(--expense)' : (isFrozen ? 'var(--text-dim)' : 'var(--primary)')}">
+              ${isFrozen ? '🔒 Frozen' : (isOver ? 'ဘတ်ဂျက်ကျော်!' : `ကျန်: ${remaining.toLocaleString()} Ks`)}
+            </span>
+          </div>
+          <div class="jar-badges">
+            ${isFrozen ? '<span class="badge-tag badge-frozen">🛡️ ရှင်သန်ရေးစနစ်အရ ပိတ်ထားသည်</span>' : ''}
+            ${isSpilloverActive ? '<span class="badge-tag badge-spill">🌊 စုငွေပြည့်၍ ရင်းနှီးမြှုပ်နှံမှုသို့ လျှံကျနေသည်</span>' : ''}
+            ${j.id === 'play' && jarLoanOwed > 0 ? '<span class="badge-tag badge-loan">⚠️ ချေးငွေဆပ်ရန်ရှိ</span>' : ''}
+          </div>
+          <div class="jar-stats">
+            <span>သုံးပြီး: ${spent.toLocaleString()} Ks</span>
+            <span>ခွဲတမ်း: ${allocatedQuota.toLocaleString()} Ks</span>
+          </div>
+          <div class="jar-bar-bg">
+            <div class="jar-bar-fill" style="width: ${isFrozen ? 0 : progressPct}%; background: ${isOver ? 'var(--expense)' : j.color};"></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderJarSliders() {
+      const container = document.getElementById('jarSlidersContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      defaultJars.forEach(j => {
+        const curVal = jarPercentages[j.id] || j.defaultPct;
+        const row = document.createElement('div');
+        row.style.marginBottom = '12px';
+        row.innerHTML = `
+          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+            <span>${j.icon} ${j.name}</span>
+            <span id="sliderVal_${j.id}" style="font-weight:700; color:${j.color};">${curVal}%</span>
+          </div>
+          <input type="range" min="0" max="100" value="${curVal}" id="slider_${j.id}" 
+            style="width:100%; accent-color:${j.color};" oninput="updateSliderLabel('${j.id}')">
+        `;
+        container.appendChild(row);
+      });
+      calcTotalPct();
+    }
+
+    function updateSliderLabel(id) {
+      const val = document.getElementById(`slider_${id}`).value;
+      document.getElementById(`sliderVal_${id}`).textContent = `${val}%`;
+      calcTotalPct();
+    }
+
+    function calcTotalPct() {
+      let sum = 0;
+      defaultJars.forEach(j => {
+        sum += parseInt(document.getElementById(`slider_${j.id}`).value || 0);
+      });
+      const badge = document.getElementById('jarTotalPct');
+      badge.textContent = `ပေါင်းလဒ်: ${sum}%`;
+      badge.style.color = sum === 100 ? 'var(--primary)' : 'var(--expense)';
+      return sum;
+    }
+
+    function saveJarPercentages() {
+      const sum = calcTotalPct();
+      if (sum !== 100) {
+        alert(`ရာခိုင်နှုန်း ပေါင်းလဒ်သည် ၁၀၀% ပြည့်ရပါမည် (လက်ရှိတွင် ${sum}% ဖြစ်နေပါသည်)`);
+        return;
+      }
+      defaultJars.forEach(j => {
+        jarPercentages[j.id] = parseInt(document.getElementById(`slider_${j.id}`).value);
+      });
+      localStorage.setItem('jar_percentages', JSON.stringify(jarPercentages));
+      alert('အိုး ၆ လုံး ရာခိုင်နှုန်း သတ်မှတ်ချက် သိမ်းဆည်းပြီးပါပြီ ✓');
+      renderAll();
     }
 
     function renderAll() {
@@ -884,14 +1171,15 @@
       document.getElementById('totalIncome').textContent = `${totalInc.toLocaleString()} Ks`;
       document.getElementById('totalExpense').textContent = `${totalExp.toLocaleString()} Ks`;
 
-      // Recent 5 list
+      // Recent Transactions
       const recentList = document.getElementById('recentList');
       recentList.innerHTML = '';
       transactions.slice(0, 5).forEach(t => recentList.appendChild(createTxElement(t)));
 
       renderHistory();
       renderDebt();
-      drawChart(totalExp, filtered);
+      renderJarsTab(totalInc, filtered);
+      renderJarSliders();
       updatePinButton();
     }
 
@@ -987,63 +1275,12 @@
       });
     }
 
-    function drawChart(totalExp, currentFilteredList) {
-      const canvas = document.getElementById('donutChart');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const container = document.getElementById('categoryBars');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      container.innerHTML = '';
-
-      if (totalExp === 0) {
-        container.innerHTML = '<p style="text-align:center;color:#64748b;font-size:13px;padding:20px;">ဤကာလတွင် အသုံးစရိတ် စာရင်းမရှိသေးပါ</p>';
-        return;
-      }
-
-      const catMap = {};
-      currentFilteredList.filter(t => t.type === 'Expense').forEach(t => {
-        catMap[t.category] = (catMap[t.category] || 0) + t.amount;
-      });
-
-      let startAngle = -0.5 * Math.PI;
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const radius = 80;
-
-      for (const [cat, amt] of Object.entries(catMap)) {
-        const sliceAngle = (amt / totalExp) * 2 * Math.PI;
-        const meta = getCatMeta(cat);
-
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
-        ctx.lineWidth = 26;
-        ctx.strokeStyle = meta.color;
-        ctx.stroke();
-
-        startAngle += sliceAngle;
-
-        const pct = Math.round((amt / totalExp) * 100);
-        const item = document.createElement('div');
-        item.style.marginBottom = '12px';
-        item.innerHTML = `
-          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;font-weight:600;">
-            <span>${meta.icon} ${cat}</span>
-            <span>${amt.toLocaleString()} Ks (${pct}%)</span>
-          </div>
-          <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;">
-            <div style="height:100%;width:${pct}%;background:${meta.color};border-radius:3px;"></div>
-          </div>
-        `;
-        container.appendChild(item);
-      }
-    }
-
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
-      btn.classList.add('active');
-      if (tabId === 'tabAnalytics') renderAll();
+      if (btn) btn.classList.add('active');
+      if (tabId === 'tabJars') renderAll();
     }
 
     function exportToCSV() {
@@ -1051,7 +1288,7 @@
         alert('ထုတ်ယူရန် စာရင်းမရှိသေးပါ');
         return;
       }
-      let csv = 'အမျိုးအစား,ရက်စွဲ,ခေါင်းစဉ်/နာမည်,ငွေပမာဏ,မှတ်ချက်,အခြေအနေ\n';
+      let csv = 'အမျိုးအစား,ရက်စွဲ,အိုး/ခေါင်းစဉ်,ငွေပမာဏ,မှတ်ချက်,အခြေအနေ\n';
       transactions.forEach(t => {
         csv += `"${t.type}","${t.date}","${t.category}","${t.amount}","${t.note || ''}","-"\n`;
       });
@@ -1069,6 +1306,8 @@
       if (confirm('မှတ်ထားသမျှ ငွေစာရင်းနှင့် အကြွေးစာရင်း အားလုံးကို ဖျက်ရန် သေချာပါသလား?')) {
         transactions = [];
         debtRecords = [];
+        jarLoanOwed = 0;
+        localStorage.removeItem('jar_loan_owed');
         saveData();
         saveDebtData();
         renderAll();
