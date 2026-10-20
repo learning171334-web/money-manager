@@ -5,32 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Money Manager Pro</title>
 
-  <!-- Google tag (gtag.js) - GA4 ID ထည့်ရန်နေရာ -->
-  <!--
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
-  -->
-
   <style>
     :root {
-      --bg: #0b0f19;
-      --card-bg: rgba(22, 30, 49, 0.85);
+      --bg: #070b13;
+      --card-bg: rgba(18, 25, 41, 0.85);
       --card-border: rgba(255, 255, 255, 0.08);
       --primary: #10b981;
-      --primary-glow: rgba(16, 185, 129, 0.35);
+      --primary-glow: rgba(16, 185, 129, 0.4);
       --expense: #f43f5e;
-      --expense-glow: rgba(244, 63, 94, 0.35);
+      --expense-glow: rgba(244, 63, 94, 0.4);
       --debt-lent: #38bdf8;
       --debt-borrow: #f59e0b;
       --text: #f8fafc;
       --text-dim: #94a3b8;
       --accent: #38bdf8;
-      --warning: #f59e0b;
     }
 
     * {
@@ -47,7 +35,9 @@
       display: flex;
       justify-content: center;
       min-height: 100vh;
-      padding-bottom: 85px;
+      /* AppsGeyser ကြော်ငြာဘား မဖုံးလွှမ်းစေရန် padding အလုံအလောက်ချဲ့ထားပါသည် */
+      padding-bottom: 125px;
+      overflow-x: hidden;
     }
 
     .app-wrapper {
@@ -57,17 +47,59 @@
       position: relative;
     }
 
-    /* Top Header */
-    .header {
-      padding: 20px 20px 10px 20px;
+    /* Ambient Lighting Background */
+    .ambient-glow {
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+      top: -50px;
+      left: -50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Top Greeting & Streak Bar */
+    .top-status-bar {
+      padding: 16px 20px 6px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .greeting-text {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+    .streak-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #fbbf24;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+    }
+
+    /* Header */
+    .header {
+      padding: 4px 20px 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
     }
     .header h1 {
       font-size: 20px;
       font-weight: 800;
-      background: linear-gradient(135deg, #fff, #94a3b8);
+      background: linear-gradient(135deg, #ffffff, #94a3b8);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -88,6 +120,8 @@
       grid-template-columns: repeat(4, 1fr);
       gap: 6px;
       padding: 6px 18px 12px 18px;
+      position: relative;
+      z-index: 1;
     }
     .filter-btn {
       padding: 8px 4px;
@@ -100,6 +134,7 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+    .filter-btn:active { transform: scale(0.96); }
     .filter-btn.active {
       background: var(--primary);
       color: #fff;
@@ -109,16 +144,19 @@
 
     /* Balance Card */
     .balance-card {
-      margin: 0 18px 18px 18px;
-      padding: 22px;
+      margin: 0 18px 16px 18px;
+      padding: 20px;
       border-radius: 22px;
-      background: radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.18) 0%, rgba(30, 41, 59, 0.75) 100%);
+      background: radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.18) 0%, rgba(22, 30, 49, 0.9) 100%);
       border: 1px solid var(--card-border);
       backdrop-filter: blur(16px);
       box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.6);
+      position: relative;
+      z-index: 1;
+      transition: transform 0.2s;
     }
     .balance-title {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-dim);
       letter-spacing: 0.5px;
       text-transform: uppercase;
@@ -128,33 +166,46 @@
     .balance-num {
       font-size: 30px;
       font-weight: 800;
-      margin: 8px 0 16px 0;
+      margin: 6px 0 10px 0;
       letter-spacing: -0.5px;
+    }
+    .daily-safe-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 16px;
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 12px;
     }
     .stats-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      padding-top: 14px;
+      padding-top: 12px;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
     .stat-pill { display: flex; align-items: center; gap: 8px; }
     .stat-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 13px;
     }
     .stat-icon.inc { background: rgba(16, 185, 129, 0.15); color: var(--primary); }
     .stat-icon.exp { background: rgba(244, 63, 94, 0.15); color: var(--expense); }
     .stat-label { font-size: 11px; color: var(--text-dim); }
     .stat-val { font-size: 13px; font-weight: 700; margin-top: 2px; }
 
-    /* Survival Mode Alert Banner */
+    /* Survival Mode Alert */
     .survival-banner {
       background: linear-gradient(135deg, rgba(244, 63, 94, 0.2), rgba(245, 158, 11, 0.15));
       border: 1px solid rgba(244, 63, 94, 0.4);
@@ -171,14 +222,10 @@
       gap: 6px;
       margin-bottom: 4px;
     }
-    .survival-banner p {
-      font-size: 11px;
-      color: #cbd5e1;
-      line-height: 1.4;
-    }
+    .survival-banner p { font-size: 11px; color: #cbd5e1; line-height: 1.4; }
 
     /* Tabs */
-    .tab-content { display: none; padding: 0 18px; }
+    .tab-content { display: none; padding: 0 18px; position: relative; z-index: 1; }
     .tab-content.active { display: block; }
 
     .glass-box {
@@ -198,7 +245,7 @@
       align-items: center;
     }
 
-    /* Switchers */
+    /* Type Switcher */
     .type-switcher {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -255,11 +302,13 @@
       font-weight: 600;
       color: var(--accent);
       cursor: pointer;
+      transition: transform 0.15s;
     }
+    .chip:active { transform: scale(0.94); }
 
     .btn-action {
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       border-radius: 12px;
       border: none;
       font-size: 14px;
@@ -268,7 +317,9 @@
       background: linear-gradient(135deg, var(--primary), #059669);
       cursor: pointer;
       box-shadow: 0 4px 15px var(--primary-glow);
+      transition: transform 0.15s;
     }
+    .btn-action:active { transform: scale(0.97); }
 
     /* List Items */
     .tx-item {
@@ -280,6 +331,7 @@
       border: 1px solid var(--card-border);
       border-radius: 14px;
       margin-bottom: 9px;
+      transition: transform 0.15s;
     }
     .tx-left { display: flex; align-items: center; gap: 10px; }
     .tx-avatar {
@@ -298,8 +350,6 @@
     .tx-amt { font-size: 13px; font-weight: 800; }
     .tx-amt.inc { color: var(--primary); }
     .tx-amt.exp { color: var(--expense); }
-    .tx-amt.lent { color: var(--debt-lent); }
-    .tx-amt.borrow { color: var(--debt-borrow); }
     .btn-delete {
       background: transparent;
       border: none;
@@ -309,19 +359,16 @@
       padding: 4px;
     }
 
-    /* Jar Cards & Progress */
+    /* Jar Cards */
     .jar-card {
       background: rgba(11, 15, 25, 0.5);
       border: 1px solid var(--card-border);
       border-radius: 14px;
       padding: 14px;
       margin-bottom: 12px;
-      transition: all 0.3s;
+      transition: all 0.2s;
     }
-    .jar-card.frozen {
-      opacity: 0.45;
-      border-style: dashed;
-    }
+    .jar-card.frozen { opacity: 0.45; border-style: dashed; }
     .jar-header {
       display: flex;
       justify-content: space-between;
@@ -330,18 +377,8 @@
       font-weight: 700;
       margin-bottom: 6px;
     }
-    .jar-badges {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .badge-tag {
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 8px;
-      font-weight: 700;
-    }
+    .jar-badges { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+    .badge-tag { font-size: 10px; padding: 2px 8px; border-radius: 8px; font-weight: 700; }
     .badge-spill { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
     .badge-loan { background: rgba(244, 63, 94, 0.15); color: var(--expense); }
     .badge-frozen { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
@@ -359,38 +396,93 @@
       border-radius: 4px;
       overflow: hidden;
     }
-    .jar-bar-fill {
-      height: 100%;
+    .jar-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease-out; }
+
+    /* Preset Buttons */
+    .preset-container {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-preset {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: rgba(255,255,255,0.05);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Floating Action Button (FAB) */
+    .fab-btn {
+      position: fixed;
+      bottom: 92px;
+      right: 20px;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 26px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 20px var(--primary-glow);
+      z-index: 60;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .fab-btn:active {
+      transform: scale(0.92);
+      box-shadow: 0 2px 10px var(--primary-glow);
+    }
+
+    /* Quick Add Bottom Sheet Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-sheet {
+      width: 100%;
+      max-width: 440px;
+      background: #111827;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px 24px 0 0;
+      padding: 22px 20px 30px 20px;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+      animation: slideUp 0.25s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
       border-radius: 4px;
-      transition: width 0.3s;
+      margin: 0 auto 16px auto;
     }
 
-    /* Badges */
-    .badge-settled {
-      font-size: 10px;
-      padding: 2px 7px;
-      background: rgba(16, 185, 129, 0.15);
-      color: var(--primary);
-      border-radius: 10px;
-      font-weight: 700;
-    }
-    .badge-pending {
-      font-size: 10px;
-      padding: 2px 7px;
-      background: rgba(245, 158, 11, 0.15);
-      color: var(--debt-borrow);
-      border-radius: 10px;
-      font-weight: 700;
-    }
-
-    /* Bottom Nav */
+    /* Fixed Bottom Navigation Bar */
     .navbar {
       position: fixed;
       bottom: 0;
       width: 100%;
       max-width: 440px;
-      height: 70px;
-      background: rgba(15, 23, 42, 0.96);
+      height: 68px;
+      background: rgba(15, 23, 42, 0.98);
       backdrop-filter: blur(20px);
       border-top: 1px solid var(--card-border);
       display: flex;
@@ -412,6 +504,14 @@
     }
     .nav-item .icon { font-size: 18px; }
     .nav-item.active { color: var(--primary); }
+
+    /* Confetti Canvas */
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
 
     /* PIN Lock Screen */
     #lockScreen {
@@ -443,6 +543,8 @@
 </head>
 <body>
 
+  <canvas id="confettiCanvas"></canvas>
+
   <!-- PIN Lock Screen -->
   <div id="lockScreen">
     <div style="font-size: 38px; margin-bottom: 8px;">🔒</div>
@@ -468,6 +570,14 @@
   </div>
 
   <div class="app-wrapper">
+    <div class="ambient-glow"></div>
+
+    <!-- Top Greeting & Streak Status -->
+    <div class="top-status-bar">
+      <div class="greeting-text" id="greetingText">မင်္ဂလာပါ ☀️</div>
+      <div class="streak-pill" id="streakBadge">🔥 1 ရက်ဆက်တိုက်</div>
+    </div>
+
     <!-- Header -->
     <div class="header">
       <h1>💎 Money Manager</h1>
@@ -485,10 +595,13 @@
     <!-- Balance Card -->
     <div class="balance-card">
       <div class="balance-title">
-        <span>လက်ကျန်ငွေ (Net Balance)</span>
+        <span>လက်ကျန်ငွေ (NET BALANCE)</span>
         <span id="periodText" style="font-size: 10px; color: var(--accent);"></span>
       </div>
       <div class="balance-num" id="totalBalance">0 Ks</div>
+      <div class="daily-safe-badge" id="dailySafeBadge">
+        💡 <span>ဒီနေ့ သုံးနိုင်ငွေ: <b>0 Ks</b></span>
+      </div>
       <div class="stats-row">
         <div class="stat-pill">
           <div class="stat-icon inc">↓</div>
@@ -509,10 +622,9 @@
 
     <!-- TAB 1: HOME (စာရင်းသွင်း) -->
     <div id="tabHome" class="tab-content active">
-      <!-- Survival Mode Alert -->
       <div class="survival-banner" id="homeSurvivalBanner">
         <h4>🛡️ ငွေကြေး အကာအကွယ်စနစ် (Survival Mode)</h4>
-        <p id="survivalText">လက်ရှိ ဝင်ငွေသည် အခြေခံ စားဝတ်နေရေးအတွက် လိုအပ်ချက်ထက် နည်းနေပါသဖြင့် အပျော်အပါးနှင့် လိုချင်တာ အိုးများကို စနစ်က ယာယီ Freeze ပိတ်ထားပေးပါသည်။</p>
+        <p id="survivalText">လက်ရှိ ဝင်ငွေသည် အနိမ့်ဆုံး စားဝတ်နေရေးသတ်မှတ်ချက် မပြည့်မီသေးပါ။ အပျော်အပါးနှင့် လိုချင်တာ အိုးများကို ယာယီ Freeze လုပ်ထားပေးပါသည်။</p>
       </div>
 
       <div class="glass-box">
@@ -521,23 +633,24 @@
           <button id="btnInc" class="type-btn" onclick="setType('Income')">ဝင်ငွေ</button>
         </div>
 
-        <form onsubmit="addTransaction(event)">
+        <form onsubmit="addTransaction(event, false)">
           <div class="input-group">
             <label>ရက်စွဲ</label>
             <input type="date" id="txDate" class="input-field" required>
           </div>
           <div class="input-group">
-            <label>အိုးအမျိုးအစား (ကဏ္ဍ)</label>
+            <label id="catLabel">ကဏ္ဍ (အမျိုးအစား)</label>
             <select id="txCat" class="input-field" required></select>
+            <div id="mappedJarBadge" style="font-size: 10px; color: var(--accent); margin-top: 4px;"></div>
           </div>
           <div class="input-group">
             <label>ငွေပမာဏ (Ks)</label>
             <input type="number" id="txAmount" class="input-field" placeholder="0" required min="1">
             <div class="quick-chips">
-              <span class="chip" onclick="addAmount(1000)">+1,000</span>
-              <span class="chip" onclick="addAmount(5000)">+5,000</span>
-              <span class="chip" onclick="addAmount(10000)">+10,000</span>
-              <span class="chip" onclick="addAmount(50000)">+50,000</span>
+              <span class="chip" onclick="addAmount(1000, 'txAmount')">+1,000</span>
+              <span class="chip" onclick="addAmount(5000, 'txAmount')">+5,000</span>
+              <span class="chip" onclick="addAmount(10000, 'txAmount')">+10,000</span>
+              <span class="chip" onclick="addAmount(50000, 'txAmount')">+50,000</span>
             </div>
           </div>
           <div class="input-group">
@@ -562,9 +675,8 @@
           <span style="font-size: 11px; color: var(--accent); cursor: pointer;" onclick="switchTab('tabSettings', document.getElementById('navSettings'))">⚙️ ဆက်တင်</span>
         </div>
         
-        <!-- Jar Loan Banner if any -->
         <div id="jarLoanBanner" style="display:none; padding:10px 12px; background:rgba(244,63,94,0.15); border:1px solid rgba(244,63,94,0.3); border-radius:12px; font-size:11px; margin-bottom:12px;">
-          ⚠️ <b>အိုးတွင်း အကြွေး:</b> အပျော်အပါးအိုးမှ စုငွေအိုးထံသို့ ပြန်ဆပ်ရန် <span id="jarLoanAmt" style="font-weight:700; color:var(--expense);">0</span> Ks ကျန်ရှိနေပါသည်။ (လစာဝင်ချိန်တွင် အလိုအလျောက် ဖြတ်ဆပ်ပါမည်)
+          ⚠️ <b>အိုးတွင်း အကြွေး:</b> အပျော်အပါးအိုးမှ စုငွေအိုးထံသို့ ပြန်ဆပ်ရန် <span id="jarLoanAmt" style="font-weight:700; color:var(--expense);">0</span> Ks ကျန်ရှိနေပါသည်။
         </div>
 
         <div id="jarsDisplayList"></div>
@@ -627,32 +739,43 @@
 
     <!-- TAB 5: SETTINGS (ဆက်တင်) -->
     <div id="tabSettings" class="tab-content">
-      <!-- Minimum Necessities Threshold (Survival Mode Trigger) -->
+      <div class="glass-box">
+        <div class="box-heading">💰 စတင်ချိန် လက်ကျန်ငွေ (Opening Balance)</div>
+        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 8px;">
+          စာရင်းမစတင်မီ လက်ထဲတွင် လက်ရှိ အမှန်တကယ် ရှိနေသော ငွေပမာဏကို ထည့်သွင်းထားပါ။
+        </p>
+        <input type="number" id="openingBalanceInput" class="input-field" placeholder="0" onchange="saveOpeningBalance(this.value)">
+      </div>
+
+      <div class="glass-box">
+        <div class="box-heading">
+          <span>🏺 အိုး ၆ လုံး ရာခိုင်နှုန်း သတ်မှတ်ချက်</span>
+          <span id="jarTotalPct" style="font-size: 12px; font-weight: 800; color: var(--primary);">100%</span>
+        </div>
+        <div class="preset-container">
+          <button class="btn-preset" onclick="applyPreset(40,15,10,10,15,10)">⚖️ ပုံမှန် (40/15/10/10/15/10)</button>
+          <button class="btn-preset" onclick="applyPreset(50,20,5,5,10,10)">📉 ချွေတာရေး</button>
+          <button class="btn-preset" onclick="applyPreset(30,30,10,5,15,10)">📈 Investor</button>
+          <button class="btn-preset" onclick="autoBalanceSliders()" style="color:var(--primary); border-color:var(--primary);">✨ 100% Auto-Balance</button>
+        </div>
+        <div id="jarSlidersContainer"></div>
+        <button class="btn-action" onclick="saveJarPercentages()" style="background: #334155; margin-top: 10px; padding: 10px;">ရာခိုင်နှုန်း အတည်ပြု သိမ်းဆည်းမည် ✓</button>
+      </div>
+
       <div class="glass-box">
         <div class="box-heading">🛡️ အနိမ့်ဆုံး စားဝတ်နေရေးသတ်မှတ်ချက် (Survival Target)</div>
         <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;">
-          လစဉ် ဝင်ငွေသည် ဤပမာဏအောက် လျော့နည်းပါက အပျော်အပါးနှင့် လိုချင်တာ အိုးများကို အလိုအလျောက် ပိတ် (Freeze) ထားပေးမည်။
+          လစဉ် ဝင်ငွေသည် ဤပမာဏအောက် လျော့နည်းပါက အပျော်အပါးနှင့် လိုချင်တာ အိုးများကို အလိုအလျောက် Freeze ပိတ်ထားမည်။
         </p>
         <input type="number" id="minNecInput" class="input-field" placeholder="ဥပမာ - 200000" onchange="saveMinNec(this.value)">
       </div>
 
-      <!-- Spillover Target Cap Setting -->
       <div class="glass-box">
         <div class="box-heading">🌊 စုငွေအိုး ပြည့်မှတ်သတ်မှတ်ချက် (Spillover Cap)</div>
         <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;">
           စုငွေအိုးထဲတွင် ဤငွေပမာဏ ပြည့်သွားပါက ပိုလျှံငွေများကို ရင်းနှီးမြှုပ်နှံမှု အိုးထဲသို့ အလိုအလျောက် စီးဝင်စေမည်။
         </p>
         <input type="number" id="spilloverCapInput" class="input-field" placeholder="ဥပမာ - 1000000" onchange="saveSpilloverCap(this.value)">
-      </div>
-
-      <!-- 6 Jars Percentage Sliders -->
-      <div class="glass-box">
-        <div class="box-heading">
-          <span>🏺 အိုး ၆ လုံး ရာခိုင်နှုန်း သတ်မှတ်ချက်</span>
-          <span id="jarTotalPct" style="font-size: 12px; font-weight: 800; color: var(--primary);">100%</span>
-        </div>
-        <div id="jarSlidersContainer"></div>
-        <button class="btn-action" onclick="saveJarPercentages()" style="background: #334155; margin-top: 10px; padding: 10px;">ရာခိုင်နှုန်း အတည်ပြု သိမ်းဆည်းမည် ✓</button>
       </div>
 
       <div class="glass-box">
@@ -662,13 +785,57 @@
 
       <div class="glass-box">
         <div class="box-heading">🔒 လုံခြုံရေး PIN ကုတ်</div>
-        <button class="btn-action" onclick="configurePin()" style="background: #334155; margin-bottom: 8px;" id="pinStatusBtn">PIN ကုဒ် သတ်မှတ်မည်</button>
+        <button class="btn-action" onclick="configurePin()" style="background: #334155;" id="pinStatusBtn">PIN ကုဒ် သတ်မှတ်မည်</button>
       </div>
 
       <div class="glass-box">
-        <div class="box-heading">💾 ဒေတာ ထိန်းသိမ်းမှု (Backup)</div>
+        <div class="box-heading">💾 ဒေတာ ထိန်းသိမ်းမှု (Backup & Restore)</div>
         <button class="btn-action" onclick="exportToCSV()" style="background: #0284c7; margin-bottom: 10px;">📥 Excel (CSV) သို့ ဒေါင်းလုဒ်ထုတ်မည်</button>
+        <button class="btn-action" onclick="backupJSON()" style="background: #475569; margin-bottom: 10px;">💾 Backup ဖိုင်ထုတ်ယူမည် (JSON)</button>
+        <label class="btn-action" style="background: #1e293b; display: block; text-align: center; cursor: pointer; margin-bottom: 10px;">
+          📂 Backup ဖိုင် ပြန်သွင်းမည် (Restore)
+          <input type="file" id="restoreFileInput" style="display:none;" accept=".json" onchange="restoreJSON(event)">
+        </label>
         <button class="btn-action" onclick="clearAllData()" style="background: var(--expense);">🗑️ စာရင်းအားလုံး ဖျက်မည်</button>
+      </div>
+    </div>
+
+    <!-- Floating Action Button (+) -->
+    <div class="fab-btn" onclick="openQuickAddModal()">+</div>
+
+    <!-- Quick Add Bottom Sheet Modal -->
+    <div class="modal-overlay" id="quickAddModal" onclick="closeQuickAddModal(event)">
+      <div class="modal-sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="box-heading" style="margin-bottom: 12px;">
+          <span>⚡ အမြန်စာရင်းသွင်းမည်</span>
+          <span style="font-size: 16px; cursor: pointer; color: var(--text-dim);" onclick="closeQuickAddModal()">✕</span>
+        </div>
+        <div class="type-switcher">
+          <button id="modalBtnExp" class="type-btn active-exp" onclick="setQuickType('Expense')">အသုံးစရိတ်</button>
+          <button id="modalBtnInc" class="type-btn" onclick="setQuickType('Income')">ဝင်ငွေ</button>
+        </div>
+        <form onsubmit="addTransaction(event, true)">
+          <div class="input-group">
+            <label>ကဏ္ဍ (အမျိုးအစား)</label>
+            <select id="modalTxCat" class="input-field" required></select>
+          </div>
+          <div class="input-group">
+            <label>ငွေပမာဏ (Ks)</label>
+            <input type="number" id="modalTxAmount" class="input-field" placeholder="0" required min="1">
+            <div class="quick-chips">
+              <span class="chip" onclick="addAmount(1000, 'modalTxAmount')">+1,000</span>
+              <span class="chip" onclick="addAmount(5000, 'modalTxAmount')">+5,000</span>
+              <span class="chip" onclick="addAmount(10000, 'modalTxAmount')">+10,000</span>
+              <span class="chip" onclick="addAmount(50000, 'modalTxAmount')">+50,000</span>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>မှတ်ချက် (Note)</label>
+            <input type="text" id="modalTxNote" class="input-field" placeholder="ဥပမာ - ညနေစာ စားသည်">
+          </div>
+          <button type="submit" class="btn-action" style="margin-top: 6px;">ချက်ချင်း သိမ်းဆည်းမည် ⚡</button>
+        </form>
       </div>
     </div>
 
@@ -703,20 +870,39 @@
       { id: "save", name: "စုငွေ", icon: "🏦", color: "#06b6d4", defaultPct: 10 }
     ];
 
+    const expenseCategories = [
+      { name: "အစားအသောက်", icon: "🍔", jarId: "nec" },
+      { name: "အိမ်လခ / အဆောင်ခ", icon: "🏠", jarId: "nec" },
+      { name: "ရေ / မီး / ဖုန်းဘေလ်", icon: "💡", jarId: "nec" },
+      { name: "သွားလာစရိတ် / ကားခ", icon: "🚌", jarId: "nec" },
+      { name: "ဆေးဝါးနှင့် ကျန်းမာရေး", icon: "💊", jarId: "nec" },
+      { name: "စာအုပ်နှင့် ပညာရေး", icon: "📚", jarId: "inv" },
+      { name: "ရင်းနှီးမြှုပ်နှံမှု / စီးပွားရေး", icon: "📈", jarId: "inv" },
+      { name: "ကော်ဖီ / မုန့်စားခြင်း", icon: "☕", jarId: "play" },
+      { name: "ရုပ်ရှင် / အပန်းဖြေခြင်း", icon: "🎬", jarId: "play" },
+      { name: "အဝတ်အထည်", icon: "👕", jarId: "wants" },
+      { name: "ဖုန်း / Gadget / အလှကုန်", icon: "📱", jarId: "wants" },
+      { name: "ကား / ဆိုင်ကယ် အရစ်ကျ", icon: "🛵", jarId: "ltss" },
+      { name: "ခရီးသွား စုငွေ", icon: "🧳", jarId: "ltss" },
+      { name: "အရေးပေါ် စုငွေ", icon: "🏦", jarId: "save" }
+    ];
+
     const incomeCategories = [
-      { name: "လစာ", icon: "💼", color: "#10b981" },
-      { name: "ရင်းနှီးမြှုပ်နှံမှု အမြတ်", icon: "📈", color: "#34d399" },
-      { name: "အပိုဝင်ငွေ/Freelance", icon: "💵", color: "#38bdf8" },
-      { name: "မုန့်ဖိုး/လက်ဆောင်", icon: "🎁", color: "#f472b6" },
-      { name: "အရောင်းအဝယ်", icon: "🏪", color: "#818cf8" }
+      { name: "လစာ", icon: "💼" },
+      { name: "ရင်းနှီးမြှုပ်နှံမှု အမြတ်", icon: "📈" },
+      { name: "အပိုဝင်ငွေ/Freelance", icon: "💵" },
+      { name: "မုန့်ဖိုး/လက်ဆောင်", icon: "🎁" },
+      { name: "အရောင်းအဝယ် အမြတ်", icon: "🏪" }
     ];
 
     let currentType = 'Expense';
+    let quickModalType = 'Expense';
     let currentDebtType = 'Lent';
     let currentTimeFilter = 'month';
     let payday = parseInt(localStorage.getItem('payday_start') || '1');
     let minNecThreshold = parseFloat(localStorage.getItem('min_nec_threshold') || '200000');
     let spilloverCap = parseFloat(localStorage.getItem('spillover_cap') || '1000000');
+    let openingBalance = parseFloat(localStorage.getItem('opening_balance') || '0');
     let jarLoanOwed = parseFloat(localStorage.getItem('jar_loan_owed') || '0');
 
     let transactions = JSON.parse(localStorage.getItem('money_records') || '[]');
@@ -736,6 +922,52 @@
     document.getElementById('debtDate').value = todayStr;
     document.getElementById('minNecInput').value = minNecThreshold;
     document.getElementById('spilloverCapInput').value = spilloverCap;
+    document.getElementById('openingBalanceInput').value = openingBalance;
+
+    // Greeting & Streak
+    function updateGreetingAndStreak() {
+      const hour = new Date().getHours();
+      let greeting = 'မင်္ဂလာပါ ☀️';
+      if (hour < 12) greeting = 'မင်္ဂလာ နံနက်ခင်းပါ ☀️';
+      else if (hour < 17) greeting = 'မင်္ဂလာ နေ့ခင်းပါ ☕';
+      else if (hour < 21) greeting = 'ညနေခင်း အနားယူချိန် 🌆';
+      else greeting = 'ကောင်းသော ညချမ်းပါ 🌙';
+      document.getElementById('greetingText').textContent = greeting;
+
+      const lastDate = localStorage.getItem('streak_last_date') || '';
+      let streak = parseInt(localStorage.getItem('streak_count') || '1');
+
+      if (lastDate) {
+        const last = new Date(lastDate);
+        const now = new Date(todayStr);
+        const diffDays = Math.round((now - last) / (1000 * 60 * 60 * 24));
+        if (diffDays > 1) {
+          streak = 1;
+          localStorage.setItem('streak_count', streak);
+        }
+      }
+      document.getElementById('streakBadge').textContent = `🔥 ${streak} ရက်ဆက်တိုက်`;
+    }
+
+    function recordStreakActivity() {
+      const lastDate = localStorage.getItem('streak_last_date') || '';
+      let streak = parseInt(localStorage.getItem('streak_count') || '1');
+
+      if (lastDate !== todayStr) {
+        if (lastDate) {
+          const last = new Date(lastDate);
+          const now = new Date(todayStr);
+          const diffDays = Math.round((now - last) / (1000 * 60 * 60 * 24));
+          if (diffDays === 1) streak++;
+          else streak = 1;
+        } else {
+          streak = 1;
+        }
+        localStorage.setItem('streak_last_date', todayStr);
+        localStorage.setItem('streak_count', streak);
+      }
+      updateGreetingAndStreak();
+    }
 
     // Initialize Payday Dropdown
     const paydaySelect = document.getElementById('paydaySelect');
@@ -817,6 +1049,12 @@
       renderAll();
     }
 
+    function saveOpeningBalance(val) {
+      openingBalance = parseFloat(val) || 0;
+      localStorage.setItem('opening_balance', openingBalance);
+      renderAll();
+    }
+
     function saveMinNec(val) {
       minNecThreshold = parseFloat(val) || 0;
       localStorage.setItem('min_nec_threshold', minNecThreshold);
@@ -833,7 +1071,14 @@
       currentType = type;
       document.getElementById('btnExp').className = `type-btn ${type === 'Expense' ? 'active-exp' : ''}`;
       document.getElementById('btnInc').className = `type-btn ${type === 'Income' ? 'active-inc' : ''}`;
-      populateCategories();
+      populateCategories('txCat', currentType);
+    }
+
+    function setQuickType(type) {
+      quickModalType = type;
+      document.getElementById('modalBtnExp').className = `type-btn ${type === 'Expense' ? 'active-exp' : ''}`;
+      document.getElementById('modalBtnInc').className = `type-btn ${type === 'Income' ? 'active-inc' : ''}`;
+      populateCategories('modalTxCat', quickModalType);
     }
 
     function setDebtType(type) {
@@ -849,14 +1094,15 @@
       renderAll();
     }
 
-    function populateCategories() {
-      const select = document.getElementById('txCat');
+    function populateCategories(selectId, type) {
+      const select = document.getElementById(selectId);
+      if (!select) return;
       select.innerHTML = '';
-      if (currentType === 'Expense') {
-        defaultJars.forEach(j => {
+      if (type === 'Expense') {
+        expenseCategories.forEach(c => {
           const opt = document.createElement('option');
-          opt.value = j.name;
-          opt.textContent = `${j.icon} ${j.name}`;
+          opt.value = c.name;
+          opt.textContent = `${c.icon} ${c.name}`;
           select.appendChild(opt);
         });
       } else {
@@ -867,11 +1113,37 @@
           select.appendChild(opt);
         });
       }
+      if (selectId === 'txCat') updateMappedJarText();
     }
 
-    function addAmount(val) {
-      const input = document.getElementById('txAmount');
+    document.getElementById('txCat').addEventListener('change', updateMappedJarText);
+
+    function updateMappedJarText() {
+      const badge = document.getElementById('mappedJarBadge');
+      if (currentType === 'Expense') {
+        const selName = document.getElementById('txCat').value;
+        const cat = expenseCategories.find(c => c.name === selName);
+        if (cat) {
+          const jar = defaultJars.find(j => j.id === cat.jarId);
+          badge.textContent = `➡️ အလိုအလျောက် သတ်မှတ်ထားသောအိုး: ${jar ? jar.name : '-'}`;
+        }
+      } else {
+        badge.textContent = '';
+      }
+    }
+
+    function addAmount(val, inputId) {
+      const input = document.getElementById(inputId);
       input.value = (parseFloat(input.value || 0) + val);
+    }
+
+    // Modal FAB Functions
+    function openQuickAddModal() {
+      document.getElementById('quickAddModal').style.display = 'flex';
+      setQuickType('Expense');
+    }
+    function closeQuickAddModal(e) {
+      document.getElementById('quickAddModal').style.display = 'none';
     }
 
     function getPaydayMonthRange(targetDate = new Date()) {
@@ -918,35 +1190,99 @@
       }
     }
 
-    function addTransaction(e) {
-      e.preventDefault();
-      const amount = parseFloat(document.getElementById('txAmount').value);
-      const category = document.getElementById('txCat').value;
-      const date = document.getElementById('txDate').value;
-      const note = document.getElementById('txNote').value.trim();
+    // Animated Counter
+    function animateCounter(id, targetVal) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const startVal = parseInt(el.getAttribute('data-val') || '0', 10);
+      el.setAttribute('data-val', targetVal);
+      const duration = 400;
+      const startTime = performance.now();
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const current = Math.round(startVal + (targetVal - startVal) * (1 - Math.pow(1 - progress, 2)));
+        el.textContent = `${current.toLocaleString()} Ks`;
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
 
-      // Check if Play jar is exceeding and create Jar Loan record
-      if (currentType === 'Expense' && category === 'အပျော်အပါးစရိတ်') {
-        const currentFiltered = filterTransactionsByTime(transactions);
-        let totalInc = 0;
-        currentFiltered.filter(t => t.type === 'Income').forEach(t => totalInc += t.amount);
-        const playQuota = (totalInc * (jarPercentages['play'] || 10)) / 100;
-        let playSpent = 0;
-        currentFiltered.filter(t => t.type === 'Expense' && t.category === 'အပျော်အပါးစရိတ်').forEach(t => playSpent += t.amount);
+    // Confetti Effect
+    function triggerConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-        if (playSpent + amount > playQuota && playQuota > 0) {
-          const overAmt = (playSpent + amount) - playQuota;
-          jarLoanOwed += amount;
-          localStorage.setItem('jar_loan_owed', jarLoanOwed);
-        }
+      const particles = [];
+      const colors = ['#10b981', '#38bdf8', '#f59e0b', '#ec4899', '#a855f7'];
+
+      for (let i = 0; i < 40; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          r: Math.random() * 5 + 3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 8,
+          vy: (Math.random() - 0.5) * 8 - 3,
+          alpha: 1
+        });
       }
 
-      transactions.unshift({ id: Date.now(), type: currentType, amount, category, date, note });
-      saveData();
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.2;
+          p.alpha -= 0.02;
+          if (p.alpha > 0) {
+            alive = true;
+            ctx.save();
+            ctx.globalAlpha = p.alpha;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        });
+        if (alive) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      requestAnimationFrame(draw);
+    }
 
-      document.getElementById('txAmount').value = '';
-      document.getElementById('txNote').value = '';
-      if (navigator.vibrate) navigator.vibrate(35);
+    function addTransaction(e, isModal = false) {
+      e.preventDefault();
+      const amountInput = isModal ? document.getElementById('modalTxAmount') : document.getElementById('txAmount');
+      const catInput = isModal ? document.getElementById('modalTxCat') : document.getElementById('txCat');
+      const noteInput = isModal ? document.getElementById('modalTxNote') : document.getElementById('txNote');
+      const activeType = isModal ? quickModalType : currentType;
+
+      const amount = parseFloat(amountInput.value);
+      const category = catInput.value;
+      const date = isModal ? todayStr : document.getElementById('txDate').value;
+      const note = noteInput.value.trim();
+
+      let jarId = '';
+      if (activeType === 'Expense') {
+        const expCat = expenseCategories.find(c => c.name === category);
+        jarId = expCat ? expCat.jarId : 'nec';
+      }
+
+      transactions.unshift({ id: Date.now(), type: activeType, amount, category, jarId, date, note });
+      saveData();
+      recordStreakActivity();
+
+      amountInput.value = '';
+      noteInput.value = '';
+      if (isModal) closeQuickAddModal();
+
+      if (navigator.vibrate) navigator.vibrate(40);
+      triggerConfetti();
       renderAll();
     }
 
@@ -996,42 +1332,65 @@
     function saveDebtData() { localStorage.setItem('debt_records', JSON.stringify(debtRecords)); }
 
     function getCatMeta(catName) {
-      const jar = defaultJars.find(j => j.name === catName);
-      if (jar) return jar;
+      const exp = expenseCategories.find(c => c.name === catName);
+      if (exp) return exp;
       const inc = incomeCategories.find(c => c.name === catName);
       if (inc) return inc;
+      const jar = defaultJars.find(j => j.name === catName);
+      if (jar) return jar;
       return { icon: '💰', color: '#94a3b8' };
     }
 
-    // 4 Core Rules Calculation & Render
+    // Preset & Auto-Balance Sliders
+    function applyPreset(nec, inv, play, wants, ltss, save) {
+      document.getElementById('slider_nec').value = nec;
+      document.getElementById('slider_inv').value = inv;
+      document.getElementById('slider_play').value = play;
+      document.getElementById('slider_wants').value = wants;
+      document.getElementById('slider_ltss').value = ltss;
+      document.getElementById('slider_save').value = save;
+      defaultJars.forEach(j => updateSliderLabel(j.id));
+      saveJarPercentages();
+    }
+
+    function autoBalanceSliders() {
+      let currentSum = 0;
+      defaultJars.forEach(j => currentSum += parseInt(document.getElementById(`slider_${j.id}`).value || 0));
+      if (currentSum === 0) currentSum = 1;
+
+      let newSum = 0;
+      defaultJars.forEach((j, idx) => {
+        if (idx === defaultJars.length - 1) {
+          document.getElementById(`slider_${j.id}`).value = 100 - newSum;
+        } else {
+          const balanced = Math.round((parseInt(document.getElementById(`slider_${j.id}`).value || 0) / currentSum) * 100);
+          document.getElementById(`slider_${j.id}`).value = balanced;
+          newSum += balanced;
+        }
+        updateSliderLabel(j.id);
+      });
+      calcTotalPct();
+    }
+
     function renderJarsTab(totalInc, currentFilteredList) {
       const container = document.getElementById('jarsDisplayList');
       if (!container) return;
       container.innerHTML = '';
 
-      // Rule 2: Survival Mode Check
-      const isSurvival = totalInc < minNecThreshold;
+      const effectiveInc = totalInc + openingBalance;
+      const isSurvival = effectiveInc < minNecThreshold;
+
       const banner = document.getElementById('homeSurvivalBanner');
       if (isSurvival) {
         banner.style.display = 'block';
         document.getElementById('survivalText').textContent = 
-          `လက်ရှိ ဝင်ငွေ (${totalInc.toLocaleString()} Ks) သည် အနိမ့်ဆုံး စားဝတ်နေရေးသတ်မှတ်ချက် (${minNecThreshold.toLocaleString()} Ks) မပြည့်မီသေးပါ။ အပျော်အပါးနှင့် လိုချင်တာ အိုးများကို ယာယီ Freeze လုပ်ထားပါသည်။`;
+          `လက်ရှိ ဝင်ငွေ (${effectiveInc.toLocaleString()} Ks) သည် အနိမ့်ဆုံး စားဝတ်နေရေး (${minNecThreshold.toLocaleString()} Ks) မပြည့်မီသေးပါ။ အပျော်အပါးနှင့် လိုချင်တာ အိုးများကို ယာယီ Freeze လုပ်ထားပါသည်။`;
       } else {
         banner.style.display = 'none';
       }
 
-      // Rule 4: Jar Loan Banner Update
-      const loanBanner = document.getElementById('jarLoanBanner');
-      if (jarLoanOwed > 0) {
-        loanBanner.style.display = 'block';
-        document.getElementById('jarLoanAmt').textContent = jarLoanOwed.toLocaleString();
-      } else {
-        loanBanner.style.display = 'none';
-      }
-
-      // Check cumulative savings for Spillover (Rule 3)
       let cumulativeSavings = 0;
-      transactions.filter(t => t.category === 'စုငွေ').forEach(t => {
+      transactions.filter(t => t.jarId === 'save' || t.category === 'အရေးပေါ် စုငွေ').forEach(t => {
         if (t.type === 'Income') cumulativeSavings += t.amount;
         else cumulativeSavings -= t.amount;
       });
@@ -1042,13 +1401,11 @@
         let isFrozen = false;
         let isSpilloverActive = false;
 
-        // Apply Survival Mode: Freeze Play and Wants (Rule 2)
         if (isSurvival && (j.id === 'play' || j.id === 'wants')) {
           pct = 0;
           isFrozen = true;
         }
 
-        // Apply Auto-Spillover: If savings capped, spillover to investments (Rule 3)
         if (isSavingsMaxed && j.id === 'save') {
           pct = 0;
           isSpilloverActive = true;
@@ -1056,9 +1413,8 @@
           pct += (jarPercentages['save'] || 10);
         }
 
-        let allocatedQuota = (totalInc * pct) / 100;
+        let allocatedQuota = (effectiveInc * pct) / 100;
 
-        // Apply Jar Loan Auto-Repay from Play quota (Rule 4)
         if (j.id === 'play' && jarLoanOwed > 0 && allocatedQuota > 0) {
           if (allocatedQuota >= jarLoanOwed) {
             allocatedQuota -= jarLoanOwed;
@@ -1072,7 +1428,7 @@
         }
 
         let spent = 0;
-        currentFilteredList.filter(t => t.type === 'Expense' && t.category === j.name).forEach(t => spent += t.amount);
+        currentFilteredList.filter(t => t.type === 'Expense' && (t.jarId === j.id || t.category === j.name)).forEach(t => spent += t.amount);
 
         const remaining = allocatedQuota - spent;
         const progressPct = allocatedQuota > 0 ? Math.min(Math.round((spent / allocatedQuota) * 100), 100) : 0;
@@ -1090,7 +1446,6 @@
           <div class="jar-badges">
             ${isFrozen ? '<span class="badge-tag badge-frozen">🛡️ ရှင်သန်ရေးစနစ်အရ ပိတ်ထားသည်</span>' : ''}
             ${isSpilloverActive ? '<span class="badge-tag badge-spill">🌊 စုငွေပြည့်၍ ရင်းနှီးမြှုပ်နှံမှုသို့ လျှံကျနေသည်</span>' : ''}
-            ${j.id === 'play' && jarLoanOwed > 0 ? '<span class="badge-tag badge-loan">⚠️ ချေးငွေဆပ်ရန်ရှိ</span>' : ''}
           </div>
           <div class="jar-stats">
             <span>သုံးပြီး: ${spent.toLocaleString()} Ks</span>
@@ -1146,7 +1501,7 @@
     function saveJarPercentages() {
       const sum = calcTotalPct();
       if (sum !== 100) {
-        alert(`ရာခိုင်နှုန်း ပေါင်းလဒ်သည် ၁၀၀% ပြည့်ရပါမည် (လက်ရှိတွင် ${sum}% ဖြစ်နေပါသည်)`);
+        alert(`ရာခိုင်နှုန်း ပေါင်းလဒ်သည် ၁၀၀% ပြည့်ရပါမည် (လက်ရှိတွင် ${sum}% ဖြစ်နေပါသည်)။ Auto-Balance ခလုတ်ကို နှိပ်ပြီး ညှိနိုင်ပါသည်။`);
         return;
       }
       defaultJars.forEach(j => {
@@ -1166,12 +1521,17 @@
         else totalExp += t.amount;
       });
 
-      const balance = totalInc - totalExp;
-      document.getElementById('totalBalance').textContent = `${balance.toLocaleString()} Ks`;
-      document.getElementById('totalIncome').textContent = `${totalInc.toLocaleString()} Ks`;
-      document.getElementById('totalExpense').textContent = `${totalExp.toLocaleString()} Ks`;
+      const netBalance = (openingBalance + totalInc) - totalExp;
+      animateCounter('totalBalance', netBalance);
+      animateCounter('totalIncome', totalInc);
+      animateCounter('totalExpense', totalExp);
 
-      // Recent Transactions
+      const now = new Date();
+      const { endDate } = getPaydayMonthRange(now);
+      const daysLeft = Math.max(1, Math.ceil((endDate - now) / (1000 * 60 * 60 * 24)));
+      const dailySafe = Math.max(0, Math.round(netBalance / daysLeft));
+      document.getElementById('dailySafeBadge').innerHTML = `💡 <span>ဒီလကျန်ရက်: <b>${daysLeft} ရက်</b> • နေ့စဉ်သုံးနိုင်ငွေ: <b>${dailySafe.toLocaleString()} Ks</b></span>`;
+
       const recentList = document.getElementById('recentList');
       recentList.innerHTML = '';
       transactions.slice(0, 5).forEach(t => recentList.appendChild(createTxElement(t)));
@@ -1181,6 +1541,7 @@
       renderJarsTab(totalInc, filtered);
       renderJarSliders();
       updatePinButton();
+      updateGreetingAndStreak();
     }
 
     function createTxElement(t) {
@@ -1189,7 +1550,7 @@
       div.className = 'tx-item';
       div.innerHTML = `
         <div class="tx-left">
-          <div class="tx-avatar">${meta.icon}</div>
+          <div class="tx-avatar">${meta.icon || '💰'}</div>
           <div class="tx-meta">
             <div class="title">${t.category} ${t.note ? `<span style="font-weight:normal;color:#94a3b8;">(${t.note})</span>` : ''}</div>
             <div class="subtitle">${t.date}</div>
@@ -1302,19 +1663,69 @@
       link.click();
     }
 
+    function backupJSON() {
+      const data = {
+        transactions,
+        debtRecords,
+        openingBalance,
+        minNecThreshold,
+        spilloverCap,
+        jarPercentages,
+        payday
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `money_manager_full_backup_${new Date().toISOString().slice(0,10)}.json`;
+      link.click();
+    }
+
+    function restoreJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const d = JSON.parse(evt.target.result);
+          if (d.transactions) transactions = d.transactions;
+          if (d.debtRecords) debtRecords = d.debtRecords;
+          if (d.openingBalance !== undefined) openingBalance = d.openingBalance;
+          if (d.minNecThreshold !== undefined) minNecThreshold = d.minNecThreshold;
+          if (d.spilloverCap !== undefined) spilloverCap = d.spilloverCap;
+          if (d.jarPercentages) jarPercentages = d.jarPercentages;
+          if (d.payday) payday = d.payday;
+
+          saveData();
+          saveDebtData();
+          localStorage.setItem('opening_balance', openingBalance);
+          localStorage.setItem('min_nec_threshold', minNecThreshold);
+          localStorage.setItem('spillover_cap', spilloverCap);
+          localStorage.setItem('jar_percentages', JSON.stringify(jarPercentages));
+          localStorage.setItem('payday_start', payday);
+
+          alert('ဒေတာများ အောင်မြင်စွာ ပြန်လည် ထည့်သွင်းပြီးပါပြီ ✓');
+          renderAll();
+        } catch(err) {
+          alert('ဖိုင်ဖတ်၍ မရပါ (ဖိုင်ပုံစံ မှားယွင်းနေပါသည်)');
+        }
+      };
+      reader.readAsText(file);
+    }
+
     function clearAllData() {
       if (confirm('မှတ်ထားသမျှ ငွေစာရင်းနှင့် အကြွေးစာရင်း အားလုံးကို ဖျက်ရန် သေချာပါသလား?')) {
         transactions = [];
         debtRecords = [];
+        openingBalance = 0;
         jarLoanOwed = 0;
-        localStorage.removeItem('jar_loan_owed');
+        localStorage.clear();
         saveData();
         saveDebtData();
         renderAll();
       }
     }
 
-    populateCategories();
+    populateCategories('txCat', 'Expense');
     renderAll();
   </script>
 </body>
